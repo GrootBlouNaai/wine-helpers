@@ -263,117 +263,110 @@ namespace NcursesObjects
     }
 }
 
-namespace NcursesObjects
+namespace NcursesObjects;
+
+function ncurses_init()
 {
-    function ncurses_init()
+    if (function_exists('\ncurses_init')) {
+        return \ncurses_init();
+    }
+    throw new \RuntimeException("Library <ncurses> is not loaded.");
+}
+
+class Ncurses
+{
+    const KEY_LF  = 10;
+    const KEY_CR  = 13;
+    const KEY_ESC = 27;
+    const KEY_TAB = 9;
+
+    const CURSOR_INVISIBLE = 0;
+    const CURSOR_NORMAL    = 1;
+    const CURSOR_VISIBLE   = 2;
+
+    private $terminal;
+
+    public function __construct()
     {
-        if (function_exists('\ncurses_init')) {
-            return \ncurses_init();
-        }
-        throw new \RuntimeException("Library <ncurses> in not loaded.");
+        ncurses_init();
     }
 
-    class Ncurses
+    public function __destruct()
     {
-        const KEY_LF  = 10;
-        const KEY_CR  = 13;
-        const KEY_ESC = 27;
-        const KEY_TAB = 9;
+        ncurses_end();
+    }
 
-        const CURSOR_INVISIBLE = 0;
-        const CURSOR_NORMAL    = 1;
-        const CURSOR_VISIBLE   = 2;
-
-        private $terminal;
-
-        public function __construct()
-        {
-            ncurses_init();
+    public function getTerminal()
+    {
+        if (is_null($this->terminal)) {
+            $this->terminal = new Terminal;
         }
+        return $this->terminal;
+    }
 
-        public function __destruct()
-        {
-            ncurses_end();
-        }
+    public function setEchoState($state)
+    {
+        $state ? ncurses_echo() : ncurses_noecho();
+        return $this;
+    }
 
-        public function getTerminal()
-        {
-            if (is_null($this->terminal))
-                $this->terminal = new Terminal;
-            return $this->terminal;
-        }
+    public function setNewLineTranslationState($state)
+    {
+        $state ? ncurses_nl() : ncurses_nonl();
+        return $this;
+    }
 
-        public function setEchoState($state)
-        {
-            if ($state)
-                ncurses_echo();
-            else
-                ncurses_noecho();
-            return $this;
-        }
+    public function setCursorState($state)
+    {
+        ncurses_curs_set($state);
+        return $this;
+    }
 
-        public function setNewLineTranslationState($state)
-        {
-            if ($state)
-                ncurses_nl();
-            else
-                ncurses_nonl();
-            return $this;
-        }
+    public function moveOutput($y, $x)
+    {
+        ncurses_move($y, $x);
+        return $this;
+    }
 
-        public function setCursorState($state)
-        {
-            ncurses_curs_set($state);
-            return $this;
-        }
+    public function refresh()
+    {
+        ncurses_refresh();
+        return $this;
+    }
 
-        public function moveOutput($y, $x)
-        {
-            ncurses_move($y, $x);
-            return $this;
-        }
+    public function beep()
+    {
+        ncurses_beep();
+        return $this;
+    }
 
-        public function refresh()
-        {
-            ncurses_refresh();
-            return $this;
-        }
+    public function getCh()
+    {
+        return ncurses_getch();
+    }
 
-        public function beep()
-        {
-            ncurses_beep();
-            return $this;
-        }
+    public function unGetCh($ch)
+    {
+        return ncurses_ungetch($ch);
+    }
 
-        public function getCh()
-        {
-            return ncurses_getch();
-        }
+    public function updatePanels()
+    {
+        ncurses_update_panels();
+        ncurses_doupdate();
+        return $this;
+    }
 
-        public function unGetCh($ch)
-        {
-            return ncurses_ungetch($ch);
-        }
+    public function insertChar($char)
+    {
+        ncurses_insch($char);
+        return $this;
+    }
 
-        public function updatePanels()
-        {
-            ncurses_update_panels();
-            ncurses_doupdate();
-            return $this;
-        }
-
-        public function insertChar($char)
-        {
-            ncurses_insch($char);
-            return $this;
-        }
-
-        public function insertDeleteLines($count)
-        {
-            ncurses_insdelln($count);
-            return $this;
-        }
-
+    public function insertDeleteLines($count)
+    {
+        ncurses_insdelln($count);
+        return $this;
     }
 }
 
