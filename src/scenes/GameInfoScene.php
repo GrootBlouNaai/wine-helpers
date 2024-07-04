@@ -8,6 +8,12 @@ class GameInfoScene extends AbstractScene
     /** @var ProgressBarWidget */
     private $progressBar;
 
+    public function __construct(PrintWidget $print, ProgressBarWidget $progressBar)
+    {
+        $this->print = $print;
+        $this->progressBar = $progressBar;
+    }
+
     public function show()
     {
         parent::show();
@@ -34,7 +40,7 @@ class GameInfoScene extends AbstractScene
 
     public function render()
     {
-        $log = '~/game_info/logs/game_info.log';
+        $log = $this->getLogPath();
 
         $this->window
             ->border()
@@ -42,14 +48,16 @@ class GameInfoScene extends AbstractScene
             ->status($log)
             ->refresh();
 
+        $this->initializeWidgets($log);
+    }
 
-        $this->progressBar = $this->addWidget(new ProgressBarWidget($this->window));
+    private function initializeWidgets($log)
+    {
         $this->progressBar
             ->offset(mb_strlen($log) + 2, 3)
             ->setProgress(0)
             ->show();
 
-        $this->print = $this->addWidget(new PrintWidget($this->window));
         $this->print
             ->dotMode()
             ->padding(1, 0, 1)
@@ -65,5 +73,10 @@ class GameInfoScene extends AbstractScene
     public function setProgress($percent)
     {
         $this->progressBar->setProgress($percent)->render();
+    }
+
+    private function getLogPath()
+    {
+        return '~/game_info/logs/game_info.log';
     }
 }
