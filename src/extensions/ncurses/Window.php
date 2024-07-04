@@ -2,10 +2,6 @@
 
 namespace NcursesObjects;
 
-/**
- * A window object that implements functionality for ncurses window resource
- * @author wapmorgan (wapmorgan@gmail.com)
- */
 class Window {
     private $windowResource;
     private $panel;
