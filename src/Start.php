@@ -25,15 +25,25 @@ class Start
     private $event;
     private $plugins;
     private $driver;
+    private $network;
 
     public function __construct()
+    {
+        $this->initializeTemporaryFiles();
+        app($this);
+        $this->initializeServices();
+        $this->init();
+    }
+
+    private function initializeTemporaryFiles()
     {
         if (file_exists(__DIR__ . '/start-tmp')) {
             @unlink(__DIR__ . '/start-tmp');
         }
+    }
 
-        app($this);
-
+    private function initializeServices()
+    {
         $this->config     = new Config();
         $this->log        = new Logs();
         $this->command    = new Command($this->config);
@@ -62,8 +72,6 @@ class Start
         $this->plugins    = new Plugins($this->event, $this->config, $this->command, $this->fs, $this->system, $this->replaces, $this->monitor);
         $this->driver     = new Driver($this->config, $this->command, $this->system);
         $this->network    = new Network($this->config, $this->command);
-
-        $this->init();
     }
 
     private function init()
@@ -99,221 +107,34 @@ class Start
         }
     }
 
-    /**
-     * @return Config
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * @param Config $config
-     */
-    public function setConfig($config)
-    {
-        $this->config = $config;
-    }
-
-    /**
-     * @return Command
-     */
-    public function getCommand()
-    {
-        return $this->command;
-    }
-
-    /**
-     * @return System
-     */
-    public function getSystem()
-    {
-        return $this->system;
-    }
-
-    /**
-     * @return WinePrefix
-     */
-    public function getWinePrefix()
-    {
-        return $this->winePrefix;
-    }
-
-    /**
-     * @return GameInfo
-     */
-    public function getGameInfo()
-    {
-        return $this->gameInfo;
-    }
-
-    /**
-     * @return Logs
-     */
-    public function getLog()
-    {
-        return $this->log;
-    }
-
-    /**
-     * @return Update
-     */
-    public function getUpdate()
-    {
-        return $this->update;
-    }
-
-    /**
-     * @return Monitor
-     */
-    public function getMonitor()
-    {
-        return $this->monitor;
-    }
-
-    /**
-     * @return Buffer
-     */
-    public function getBuffer()
-    {
-        return $this->buffer;
-    }
-
-    /**
-     * @return Icon
-     */
-    public function getIcon()
-    {
-        return $this->icon;
-    }
-
-    /**
-     * @return FileSystem
-     */
-    public function getFileSystem()
-    {
-        return $this->fs;
-    }
-
-    /**
-     * @return Mount[]
-     */
-    public function getMountes()
-    {
-        return $this->mountes;
-    }
-
-    /**
-     * @return Pack
-     */
-    public function getPack()
-    {
-        return $this->pack;
-    }
-
-    /**
-     * @return Symlink
-     */
-    public function getSymlink()
-    {
-        return $this->symlink;
-    }
-
-    /**
-     * @return Build
-     */
-    public function getBuild()
-    {
-        return $this->build;
-    }
-
-    /**
-     * @return Wine
-     */
-    public function getWine()
-    {
-        return $this->wine;
-    }
-
-    /**
-     * @param Wine $wine
-     */
-    public function setWine($wine)
-    {
-        $this->wine = $wine;
-    }
-
-    /**
-     * @return Console
-     */
-    public function getConsole()
-    {
-        return $this->console;
-    }
-
-    /**
-     * @return Snapshot
-     */
-    public function getShapshot()
-    {
-        return $this->shapshot;
-    }
-
-    /**
-     * @return Patch
-     */
-    public function getPatch()
-    {
-        return $this->patch;
-    }
-
-    /**
-     * @return Replaces
-     */
-    public function getReplaces()
-    {
-        return $this->replaces;
-    }
-
-    /**
-     * @return Registry
-     */
-    public function getRegistry()
-    {
-        return $this->registry;
-    }
-
-    /**
-     * @return Event
-     */
-    public function getEvent()
-    {
-        return $this->event;
-    }
-
-    /**
-     * @return Plugins
-     */
-    public function getPlugins()
-    {
-        return $this->plugins;
-    }
-
-    /**
-     * @return Driver
-     */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
-
-    /**
-     * @return Network
-     */
-    public function getNetwork()
-    {
-        return $this->network;
-    }
+    // Getters and Setters
+    public function getConfig() { return $this->config; }
+    public function setConfig($config) { $this->config = $config; }
+    public function getCommand() { return $this->command; }
+    public function getSystem() { return $this->system; }
+    public function getWinePrefix() { return $this->winePrefix; }
+    public function getGameInfo() { return $this->gameInfo; }
+    public function getLog() { return $this->log; }
+    public function getUpdate() { return $this->update; }
+    public function getMonitor() { return $this->monitor; }
+    public function getBuffer() { return $this->buffer; }
+    public function getIcon() { return $this->icon; }
+    public function getFileSystem() { return $this->fs; }
+    public function getMountes() { return $this->mountes; }
+    public function getPack() { return $this->pack; }
+    public function getSymlink() { return $this->symlink; }
+    public function getBuild() { return $this->build; }
+    public function getWine() { return $this->wine; }
+    public function setWine($wine) { $this->wine = $wine; }
+    public function getConsole() { return $this->console; }
+    public function getShapshot() { return $this->shapshot; }
+    public function getPatch() { return $this->patch; }
+    public function getReplaces() { return $this->replaces; }
+    public function getRegistry() { return $this->registry; }
+    public function getEvent() { return $this->event; }
+    public function getPlugins() { return $this->plugins; }
+    public function getDriver() { return $this->driver; }
+    public function getNetwork() { return $this->network; }
 }
 
 pcntl_signal(SIGINT, function ($signal) {
