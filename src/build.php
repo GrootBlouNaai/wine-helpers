@@ -1,32 +1,55 @@
 <?php
 
-$files = include __DIR__ . '/files.php';
+/**
+ * Loads files from the given paths and processes them.
+ *
+ * @param array $paths Array of file paths to load.
+ * @return array Processed file contents.
+ */
+function loadAndProcessFiles(array $paths): array {
+    $processedFiles = [];
 
-$additional = [];
+    foreach ($paths as $path) {
+        $fileContent = file_get_contents(__DIR__ . "/{$path}");
+        if ($fileContent === false) {
+            throw new Exception("Failed to read file: {$path}");
+        }
 
-foreach ($files['additional'] as $path) {
-    $file = explode('<?php', file_get_contents(__DIR__ . "/{$path}"));
+        $fileParts = explode('<?php', $fileContent);
+        if (empty($fileParts[0])) {
+            unset($fileParts[0]);
+        }
 
-    if (!$file[0]) {
-        unset($file[0]);
+        $processedFiles[] = implode('<?php', $fileParts);
     }
 
-    $additional[] = implode('<?php', $file);
+    return $processedFiles;
 }
 
-$global = [];
+try {
+    $files = include __DIR__ . '/files.php';
 
-foreach ($files['global'] as $path) {
-    $file = explode('<?php', file_get_contents(__DIR__ . "/{$path}"));
+    $additionalFiles = loadAndProcessFiles($files['additional']);
+    $globalFiles = loadAndProcessFiles($files['global']);
 
-    if (!$file[0]) {
-        unset($file[0]);
+    $loaderContent = file_get_contents(__DIR__ . '/loader.sh');
+    if ($loaderContent === false) {
+        throw new Exception("Failed to read loader.sh");
     }
 
-    $global[] = implode('<?php', $file);
+    $data = $loaderContent . "\n\n<?php\n" . implode("\n\n", $additionalFiles) . "\n\nnamespace { " . implode("\n\n", $globalFiles) . "\n}";
+
+    $startFilePath = dirname(__DIR__) . '/start';
+    if (file_put_contents($startFilePath, $data) === false) {
+        throw new Exception("Failed to write to start file: {$startFilePath}");
+    }
+
+    $testStartFilePath = '/home/JohncenaPenguinJizz/RumNotDead/test/start';
+    if (file_put_contents($testStartFilePath, $data) === false) {
+        throw new Exception("Failed to write to test start file: {$testStartFilePath}");
+    }
+
+    echo "Files processed and saved successfully.";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
 }
-
-$data = file_get_contents(__DIR__ . '/loader.sh') . "\n\n<?php\n" . implode("\n\n", $additional) . "\n\nnamespace { " . implode("\n\n", $global) . "\n}";
-
-file_put_contents(dirname(__DIR__). '/start', $data);
-file_put_contents('/home/neiron/PhpstormProjects/test/start', $data);
