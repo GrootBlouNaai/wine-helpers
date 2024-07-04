@@ -7,11 +7,6 @@ class Wine {
     private $version;
     private $missingLibs;
 
-    /**
-     * Wine constructor.
-     * @param Config $config
-     * @param Command $command
-     */
     public function __construct(Config $config, Command $command)
     {
         $this->command = $command;
@@ -20,22 +15,20 @@ class Wine {
 
     public function boot()
     {
-        $this->command->run(Text::quoteArgs($this->config->wine('WINEBOOT')) . ' && ' . Text::quoteArgs($this->config->wine('WINESERVER')) . ' -w');
+        $this->runCommand($this->config->wine('WINEBOOT'), ' && ', $this->config->wine('WINESERVER'), ' -w');
     }
 
     public function down()
     {
-        $this->command->run(Text::quoteArgs($this->config->wine('WINESERVER')) . ' -k');
+        $this->runCommand($this->config->wine('WINESERVER'), ' -k');
     }
 
     public function run($args)
     {
-        $cmd = Text::quoteArgs($args);
-
-        $result = $this->command->run(Text::quoteArgs($this->config->wine('WINE')) . " {$cmd}");
+        $result = $this->runCommand($this->config->wine('WINE'), $args);
 
         if ($this->config->wine('WINEARCH') === 'win64') {
-            $result .= $this->command->run(Text::quoteArgs($this->config->wine('WINE64')) . " {$cmd}");
+            $result .= $this->runCommand($this->config->wine('WINE64'), $args);
         }
 
         return $result;
@@ -45,28 +38,22 @@ class Wine {
     {
         $config = clone $this->config;
         $config->set('wine', 'WINEDEBUG', '');
-        $cmd = Text::quoteArgs($args);
         $logFile = $this->config->getLogsDir() . '/filemanager.log';
 
-        return app('start')->getPatch()->create(function () use ($config, $cmd, $logFile) {
-            return (new Command($config))->run(Text::quoteArgs($this->config->wine('WINEFILE')) . " {$cmd}", $logFile);
-        });
+        return $this->createPatch($config, $this->config->wine('WINEFILE'), $args, $logFile);
     }
 
     public function cfg($args)
     {
-        $cmd = Text::quoteArgs($args);
-
-        return $this->command->run(Text::quoteArgs($this->config->wine('WINECFG')) . " {$cmd}");
+        return $this->runCommand($this->config->wine('WINECFG'), $args);
     }
 
     public function reg($args)
     {
-        $cmd = Text::quoteArgs($args);
-        $result = $this->command->run(Text::quoteArgs($this->config->wine('REGEDIT')) . " {$cmd}");
+        $result = $this->runCommand($this->config->wine('REGEDIT'), $args);
 
         if ($this->config->wine('WINEARCH') === 'win64') {
-            $result .= $this->command->run(Text::quoteArgs($this->config->wine('REGEDIT64')) . " {$cmd}");
+            $result .= $this->runCommand($this->config->wine('REGEDIT64'), $args);
         }
 
         return $result;
@@ -74,7 +61,7 @@ class Wine {
 
     public function regsvr32($args)
     {
-        $this->run(array_merge(['regsvr32'], $args));
+        $this->run(['regsvr32', ...$args]);
     }
 
     public function winetricks($args, $output = false)
@@ -82,16 +69,12 @@ class Wine {
         (new Update($this->config, $this->command))->downloadWinetricks();
 
         if ($args && file_exists($this->config->getRootDir() . '/winetricks')) {
-
             $config = clone $this->config;
             $config->set('wine', 'WINEDEBUG', '');
-            $cmd = Text::quoteArgs($args);
-            $title = implode('-', $args);
-            $title = mb_strlen($title) > 50 ? mb_substr($title, 0, 48) . '..' : $title;
+            $title = mb_strlen(implode('-', $args)) > 50 ? mb_substr(implode('-', $args), 0, 48) . '..' : implode('-', $args);
             $logFile = $this->config->getLogsDir() . "/winetricks-{$title}.log";
-            return app('start')->getPatch()->create(function () use (&$config, $cmd, $logFile, $output) {
-                return (new Command($config))->run(Text::quoteArgs($this->config->getRootDir() . '/winetricks') . " {$cmd}", $logFile, $output);
-            });
+
+            return $this->createPatch($config, $this->config->getRootDir() . '/winetricks', $args, $logFile, $output);
         }
 
         return '';
@@ -99,18 +82,18 @@ class Wine {
 
     public function checkSystemWine()
     {
-        return (bool)trim($this->command->run('command -v "wine"'));
+        return $this->checkCommand('wine');
     }
 
     public function checkWine()
     {
-        return (bool)trim($this->command->run('command -v ' . Text::quoteArgs($this->config->wine('WINE'))));
+        return $this->checkCommand($this->config->wine('WINE'));
     }
 
     public function version()
     {
         if (null === $this->version) {
-            $this->version = trim($this->command->run(Text::quoteArgs($this->config->wine('WINE')) . ' --version'));
+            $this->version = trim($this->runCommand($this->config->wine('WINE'), '--version'));
         }
 
         return $this->version;
@@ -125,14 +108,14 @@ class Wine {
     public function getMissingLibs()
     {
         if (null === $this->missingLibs) {
-            $help = $this->command->run(Text::quoteArgs($this->config->wine('WINE')) . ' --help');
+            $help = $this->runCommand($this->config->wine('WINE'), '--help');
 
             if (strpos($help, '--check-libs') === false) {
                 $this->missingLibs = [];
                 return $this->missingLibs;
             }
 
-            $this->missingLibs = $this->command->run(Text::quoteArgs($this->config->wine('WINE')) . ' --check-libs');
+            $this->missingLibs = $this->runCommand($this->config->wine('WINE'), '--check-libs');
             $this->missingLibs = array_filter(
                 array_map('trim', explode("\n", $this->missingLibs)),
                 function ($line) {
@@ -151,5 +134,22 @@ class Wine {
         }
 
         return $this->missingLibs;
+    }
+
+    private function runCommand($command, ...$args)
+    {
+        return $this->command->run(Text::quoteArgs($command) . ' ' . implode(' ', array_map('Text::quoteArgs', $args)));
+    }
+
+    private function checkCommand($command)
+    {
+        return (bool)trim($this->command->run('command -v ' . Text::quoteArgs($command)));
+    }
+
+    private function createPatch($config, $command, $args, $logFile, $output = false)
+    {
+        return app('start')->getPatch()->create(function () use ($config, $command, $args, $logFile, $output) {
+            return (new Command($config))->run(Text::quoteArgs($command) . ' ' . Text::quoteArgs($args), $logFile, $output);
+        });
     }
 }
