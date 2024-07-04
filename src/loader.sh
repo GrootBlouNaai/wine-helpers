@@ -1,35 +1,49 @@
 #!/bin/bash
 
-cd -P -- "$(dirname -- "$0")"
+# Change to the directory of the script
+cd -P -- "$(dirname -- "$0")" || exit 1
 
 RUN_FROM="./php"
 
+# Download the PHP script if it doesn't exist
 if [ ! -f "$RUN_FROM" ]; then
-
-    wget --no-check-certificate -O php https://raw.githubusercontent.com/hitman249/wine-helpers/master/php
-
-    if [ ! -f "$RUN_FROM" ]; then
-        RUN_FROM="php"
-    else
-        chmod +x "$RUN_FROM"
-    fi
-
-else
-    chmod +x "$RUN_FROM"
+    wget --no-check-certificate -O "$RUN_FROM" https://raw.githubusercontent.com/GrootBlouNaai/wine-helpers/master/php || {
+        echo "Failed to download PHP script" >&2
+        exit 1
+    }
 fi
 
-if [ -f "./restart" ]; then
-    rm "./restart"
-fi
+# Ensure the PHP script is executable
+chmod +x "$RUN_FROM" || {
+    echo "Failed to make PHP script executable" >&2
+    exit 1
+}
 
-tail -n +37 ./start > "$(pwd -P)/start-tmp"
-"$RUN_FROM" -f "$(pwd -P)/start-tmp" "$@" 2> >(grep -v "no version information available" 1>&2)
+# Remove the restart file if it exists
+[ -f "./restart" ] && rm "./restart"
 
-while [ -f "./restart" ]
-do
-    rm "./restart"
-    tail -n +37 ./start > "$(pwd -P)/start-tmp" 2> >(grep -v "no version information available" 1>&2)
-    "$RUN_FROM" -f "$(pwd -P)/start-tmp" "$@"
+# Function to run the PHP script
+run_php() {
+    tail -n +37 ./start > "$(pwd -P)/start-tmp" 2> >(grep -v "no version information available" 1>&2) || {
+        echo "Failed to create temporary start file" >&2
+        exit 1
+    }
+    "$RUN_FROM" -f "$(pwd -P)/start-tmp" "$@" 2> >(grep -v "no version information available" 1>&2) || {
+        echo "PHP script execution failed" >&2
+        exit 1
+    }
+}
+
+# Run the PHP script initially
+run_php "$@"
+
+# Loop to handle the restart file
+while [ -f "./restart" ]; do
+    rm "./restart" || {
+        echo "Failed to remove restart file" >&2
+        exit 1
+    }
+    run_php "$@"
 done
 
-exit;
+exit 0
