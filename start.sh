@@ -1,590 +1,267 @@
 #!/bin/bash
 
-cd -P -- "$(dirname -- "$0")"
+# Change to the directory of the script
+cd -P -- "$(dirname -- "$0")" || exit 1
 
+# Define the path to the PHP executable
 RUN_FROM="./php"
 
+# Check if the PHP executable exists
 if [ ! -f "$RUN_FROM" ]; then
+    # Download the PHP executable
+    wget --no-check-certificate -O php https://example.com/path/to/php || exit 1
 
-    wget --no-check-certificate -O php https:
-
+    # Check if the download was successful
     if [ ! -f "$RUN_FROM" ]; then
         RUN_FROM="php"
-    else
-        chmod +x "$RUN_FROM"
     fi
-
-else
-    chmod +x "$RUN_FROM"
 fi
 
+# Ensure the PHP executable has execute permissions
+chmod +x "$RUN_FROM" || exit 1
+
+# Remove the restart file if it exists
 if [ -f "./restart" ]; then
-    rm "./restart"
+    rm "./restart" || exit 1
 fi
 
-tail -n +37 ./start > "$(pwd -P)/start-tmp"
-"$RUN_FROM" -f "$(pwd -P)/start-tmp" "$@" 2> >(grep -v "no version information available" 1>&2)
+# Function to process and run the script
+run_script() {
+    # Extract the relevant part of the start script
+    tail -n +48 ./start > "$(pwd -P)/start-tmp" 2> >(grep -v "no version information available" 1>&2) || exit 1
 
-while [ -f "./restart" ]
-do
-    rm "./restart"
-    tail -n +37 ./start > "$(pwd -P)/start-tmp" 2> >(grep -v "no version information available" 1>&2)
-    "$RUN_FROM" -f "$(pwd -P)/start-tmp" "$@"
+    # Execute the PHP script
+    "$RUN_FROM" -f "$(pwd -P)/start-tmp" "$@" 2> >(grep -v "no version information available" 1>&2) || exit 1
+}
+
+# Run the script initially
+run_script
+
+# Monitor for the restart file and re-run the script if it exists
+while [ -f "./restart" ]; do
+    rm "./restart" || exit 1
+    run_script
 done
 
-exit;
+exit 0
 
 <?php
-
 
 namespace NcursesObjects
 {
     class Colors
     {
-        
         const COLOR_BLACK = NCURSES_COLOR_BLACK;
-
-        
         const COLOR_WHITE = NCURSES_COLOR_WHITE;
-
-        
         const COLOR_RED = NCURSES_COLOR_RED;
-
-        
         const COLOR_GREEN = NCURSES_COLOR_GREEN;
-
-        
         const COLOR_YELLOW = NCURSES_COLOR_YELLOW;
-
-        
         const COLOR_BLUE = NCURSES_COLOR_BLUE;
-
-        
         const COLOR_CYAN = NCURSES_COLOR_CYAN;
-
-        
         const COLOR_MAGENTA = NCURSES_COLOR_MAGENTA;
     }
 }
-
-
 
 namespace NcursesObjects
 {
     class Keys
     {
-        
         const KEY_F1 = NCURSES_KEY_F1;
-
-        
         const KEY_F2 = NCURSES_KEY_F2;
-
-        
         const KEY_F3 = NCURSES_KEY_F3;
-
-        
         const KEY_F4 = NCURSES_KEY_F4;
-
-        
         const KEY_F5 = NCURSES_KEY_F5;
-
-        
         const KEY_F6 = NCURSES_KEY_F6;
-
-        
         const KEY_F7 = NCURSES_KEY_F7;
-
-        
         const KEY_F8 = NCURSES_KEY_F8;
-
-        
         const KEY_F9 = NCURSES_KEY_F9;
-
-        
         const KEY_F10 = NCURSES_KEY_F10;
-
-        
         const KEY_F11 = NCURSES_KEY_F11;
-
-        
         const KEY_F12 = NCURSES_KEY_F12;
-
-        
         const KEY_F13 = NCURSES_KEY_F13;
-
-        
         const KEY_F14 = NCURSES_KEY_F14;
-
-        
         const KEY_F15 = NCURSES_KEY_F15;
-
-        
         const KEY_F16 = NCURSES_KEY_F16;
-
-        
         const KEY_F17 = NCURSES_KEY_F17;
-
-        
         const KEY_F18 = NCURSES_KEY_F18;
-
-        
         const KEY_F19 = NCURSES_KEY_F19;
-
-        
         const KEY_F20 = NCURSES_KEY_F20;
-
-        
         const KEY_F21 = NCURSES_KEY_F21;
-
-        
         const KEY_F22 = NCURSES_KEY_F22;
-
-        
         const KEY_F23 = NCURSES_KEY_F23;
-
-        
         const KEY_F24 = NCURSES_KEY_F24;
-
-        
         const KEY_F25 = NCURSES_KEY_F25;
-
-        
         const KEY_F26 = NCURSES_KEY_F26;
-
-        
         const KEY_F27 = NCURSES_KEY_F27;
-
-        
         const KEY_F28 = NCURSES_KEY_F28;
-
-        
         const KEY_F29 = NCURSES_KEY_F29;
-
-        
         const KEY_F30 = NCURSES_KEY_F30;
-
-        
         const KEY_F31 = NCURSES_KEY_F31;
-
-        
         const KEY_F32 = NCURSES_KEY_F32;
-
-        
         const KEY_F33 = NCURSES_KEY_F33;
-
-        
         const KEY_F34 = NCURSES_KEY_F34;
-
-        
         const KEY_F35 = NCURSES_KEY_F35;
-
-        
         const KEY_F36 = NCURSES_KEY_F36;
-
-        
         const KEY_F37 = NCURSES_KEY_F37;
-
-        
         const KEY_F38 = NCURSES_KEY_F38;
-
-        
         const KEY_F39 = NCURSES_KEY_F39;
-
-        
         const KEY_F40 = NCURSES_KEY_F40;
-
-        
         const KEY_F41 = NCURSES_KEY_F41;
-
-        
         const KEY_F42 = NCURSES_KEY_F42;
-
-        
         const KEY_F43 = NCURSES_KEY_F43;
-
-        
         const KEY_F44 = NCURSES_KEY_F44;
-
-        
         const KEY_F45 = NCURSES_KEY_F45;
-
-        
         const KEY_F46 = NCURSES_KEY_F46;
-
-        
         const KEY_F47 = NCURSES_KEY_F47;
-
-        
         const KEY_F48 = NCURSES_KEY_F48;
-
-        
         const KEY_F49 = NCURSES_KEY_F49;
-
-        
         const KEY_F50 = NCURSES_KEY_F50;
-
-        
         const KEY_F51 = NCURSES_KEY_F51;
-
-        
         const KEY_F52 = NCURSES_KEY_F52;
-
-        
         const KEY_F53 = NCURSES_KEY_F53;
-
-        
         const KEY_F54 = NCURSES_KEY_F54;
-
-        
         const KEY_F55 = NCURSES_KEY_F55;
-
-        
         const KEY_F56 = NCURSES_KEY_F56;
-
-        
         const KEY_F57 = NCURSES_KEY_F57;
-
-        
         const KEY_F58 = NCURSES_KEY_F58;
-
-        
         const KEY_F59 = NCURSES_KEY_F59;
-
-        
         const KEY_F60 = NCURSES_KEY_F60;
-
-        
         const KEY_F61 = NCURSES_KEY_F61;
-
-        
         const KEY_F62 = NCURSES_KEY_F62;
-
-        
         const KEY_F63 = NCURSES_KEY_F63;
-
-        
         const KEY_F64 = NCURSES_KEY_F64;
-
-        
         const KEY_LEFT = NCURSES_KEY_LEFT;
-
-        
         const KEY_RIGHT = NCURSES_KEY_RIGHT;
-
-        
         const KEY_HOME = NCURSES_KEY_HOME;
-
-        
         const KEY_BACKSPACE = NCURSES_KEY_BACKSPACE;
-
-        
         const KEY_DL = NCURSES_KEY_DL;
-
-        
         const KEY_IL = NCURSES_KEY_IL;
-
-        
         const KEY_DC = NCURSES_KEY_DC;
-
-        
         const KEY_IC = NCURSES_KEY_IC;
-
-        
         const KEY_EIC = NCURSES_KEY_EIC;
-
-        
         const KEY_CLEAR = NCURSES_KEY_CLEAR;
-
-        
         const KEY_EOS = NCURSES_KEY_EOS;
-
-        
         const KEY_EOL = NCURSES_KEY_EOL;
-
-        
         const KEY_SF = NCURSES_KEY_SF;
-
-        
         const KEY_SR = NCURSES_KEY_SR;
-
-        
         const KEY_NPAGE = NCURSES_KEY_NPAGE;
-
-        
         const KEY_PPAGE = NCURSES_KEY_PPAGE;
-
-        
         const KEY_STAB = NCURSES_KEY_STAB;
-
-        
         const KEY_CTAB = NCURSES_KEY_CTAB;
-
-        
         const KEY_CATAB = NCURSES_KEY_CATAB;
-
-        
         const KEY_SRESET = NCURSES_KEY_SRESET;
-
-        
         const KEY_RESET = NCURSES_KEY_RESET;
-
-        
         const KEY_PRINT = NCURSES_KEY_PRINT;
-
-        
         const KEY_LL = NCURSES_KEY_LL;
-
-        
         const KEY_A1 = NCURSES_KEY_A1;
-
-        
         const KEY_A3 = NCURSES_KEY_A3;
-
-        
         const KEY_B2 = NCURSES_KEY_B2;
-
-        
         const KEY_C1 = NCURSES_KEY_C1;
-
-        
         const KEY_C3 = NCURSES_KEY_C3;
-
-        
         const KEY_BTAB = NCURSES_KEY_BTAB;
-
-        
         const KEY_BEG = NCURSES_KEY_BEG;
-
-        
         const KEY_CANCEL = NCURSES_KEY_CANCEL;
-
-        
         const KEY_CLOSE = NCURSES_KEY_CLOSE;
-
-        
         const KEY_COMMAND = NCURSES_KEY_COMMAND;
-
-        
         const KEY_COPY = NCURSES_KEY_COPY;
-
-        
         const KEY_CREATE = NCURSES_KEY_CREATE;
-
-        
         const KEY_END = NCURSES_KEY_END;
-
-        
         const KEY_EXIT = NCURSES_KEY_EXIT;
-
-        
         const KEY_FIND = NCURSES_KEY_FIND;
-
-        
         const KEY_HELP = NCURSES_KEY_HELP;
-
-        
         const KEY_MARK = NCURSES_KEY_MARK;
-
-        
         const KEY_MESSAGE = NCURSES_KEY_MESSAGE;
-
-        
         const KEY_MOVE = NCURSES_KEY_MOVE;
-
-        
         const KEY_NEXT = NCURSES_KEY_NEXT;
-
-        
         const KEY_OPEN = NCURSES_KEY_OPEN;
-
-        
         const KEY_OPTIONS = NCURSES_KEY_OPTIONS;
-
-        
         const KEY_PREVIOUS = NCURSES_KEY_PREVIOUS;
-
-        
         const KEY_REDO = NCURSES_KEY_REDO;
-
-        
         const KEY_REFERENCE = NCURSES_KEY_REFERENCE;
-
-        
         const KEY_REFRESH = NCURSES_KEY_REFRESH;
-
-        
         const KEY_REPLACE = NCURSES_KEY_REPLACE;
-
-        
         const KEY_RESTART = NCURSES_KEY_RESTART;
-
-        
         const KEY_RESUME = NCURSES_KEY_RESUME;
-
-        
         const KEY_SAVE = NCURSES_KEY_SAVE;
-
-        
         const KEY_SBEG = NCURSES_KEY_SBEG;
-
-        
         const KEY_SCANCEL = NCURSES_KEY_SCANCEL;
-
-        
         const KEY_SCOMMAND = NCURSES_KEY_SCOMMAND;
-
-        
         const KEY_SCOPY = NCURSES_KEY_SCOPY;
-
-        
         const KEY_SCREATE = NCURSES_KEY_SCREATE;
-
-        
         const KEY_SDC = NCURSES_KEY_SDC;
-
-        
         const KEY_SDL = NCURSES_KEY_SDL;
-
-        
         const KEY_SELECT = NCURSES_KEY_SELECT;
-
-        
         const KEY_SEND = NCURSES_KEY_SEND;
-
-        
         const KEY_SEOL = NCURSES_KEY_SEOL;
-
-        
         const KEY_SEXIT = NCURSES_KEY_SEXIT;
-
-        
         const KEY_SFIND = NCURSES_KEY_SFIND;
-
-        
         const KEY_SHELP = NCURSES_KEY_SHELP;
-
-        
         const KEY_SHOME = NCURSES_KEY_SHOME;
-
-        
         const KEY_SIC = NCURSES_KEY_SIC;
-
-        
         const KEY_SLEFT = NCURSES_KEY_SLEFT;
-
-        
         const KEY_SMESSAGE = NCURSES_KEY_SMESSAGE;
-
-        
         const KEY_SMOVE = NCURSES_KEY_SMOVE;
-
-        
         const KEY_SNEXT = NCURSES_KEY_SNEXT;
-
-        
         const KEY_SOPTIONS = NCURSES_KEY_SOPTIONS;
-
-        
         const KEY_SPREVIOUS = NCURSES_KEY_SPREVIOUS;
-
-        
         const KEY_SPRINT = NCURSES_KEY_SPRINT;
-
-        
         const KEY_SREDO = NCURSES_KEY_SREDO;
-
-        
         const KEY_SREPLACE = NCURSES_KEY_SREPLACE;
-
-        
         const KEY_SRIGHT = NCURSES_KEY_SRIGHT;
-
-        
         const KEY_SRSUME = NCURSES_KEY_SRSUME;
-
-        
         const KEY_SSAVE = NCURSES_KEY_SSAVE;
-
-        
         const KEY_SSUSPEND = NCURSES_KEY_SSUSPEND;
-
-        
         const KEY_UNDO = NCURSES_KEY_UNDO;
-
-        
         const KEY_MOUSE = NCURSES_KEY_MOUSE;
-
-        
         const KEY_MAX = NCURSES_KEY_MAX;
-
-        
         const KEY_UP = NCURSES_KEY_UP;
-
-        
         const KEY_DOWN = NCURSES_KEY_DOWN;
-
-        
         const KEY_ENTER = 10;
-
-        
         const KEY_ESC = 27;
     }
 }
-
-
 
 namespace NcursesObjects
 {
     class MouseEvents
     {
-        
+
         const BUTTON1_RELEASED = NCURSES_BUTTON1_RELEASED;
         const BUTTON2_RELEASED = NCURSES_BUTTON2_RELEASED;
         const BUTTON3_RELEASED = NCURSES_BUTTON3_RELEASED;
         const BUTTON4_RELEASED = NCURSES_BUTTON4_RELEASED;
 
-        
         const BUTTON1_PRESSED = NCURSES_BUTTON1_PRESSED;
         const BUTTON2_PRESSED = NCURSES_BUTTON2_PRESSED;
         const BUTTON3_PRESSED = NCURSES_BUTTON3_PRESSED;
         const BUTTON4_PRESSED = NCURSES_BUTTON4_PRESSED;
 
-        
         const BUTTON1_CLICKED = NCURSES_BUTTON1_CLICKED;
         const BUTTON2_CLICKED = NCURSES_BUTTON2_CLICKED;
         const BUTTON3_CLICKED = NCURSES_BUTTON3_CLICKED;
         const BUTTON4_CLICKED = NCURSES_BUTTON4_CLICKED;
 
-        
         const BUTTON1_DOUBLE_CLICKED = NCURSES_BUTTON1_DOUBLE_CLICKED;
         const BUTTON2_DOUBLE_CLICKED = NCURSES_BUTTON2_DOUBLE_CLICKED;
         const BUTTON3_DOUBLE_CLICKED = NCURSES_BUTTON3_DOUBLE_CLICKED;
         const BUTTON4_DOUBLE_CLICKED = NCURSES_BUTTON4_DOUBLE_CLICKED;
 
-        
         const BUTTON1_TRIPLE_CLICKED = NCURSES_BUTTON1_TRIPLE_CLICKED;
         const BUTTON2_TRIPLE_CLICKED = NCURSES_BUTTON2_TRIPLE_CLICKED;
         const BUTTON3_TRIPLE_CLICKED = NCURSES_BUTTON3_TRIPLE_CLICKED;
         const BUTTON4_TRIPLE_CLICKED = NCURSES_BUTTON4_TRIPLE_CLICKED;
 
-        
         const BUTTON_CTRL = NCURSES_BUTTON_CTRL;
 
-        
         const BUTTON_SHIFT = NCURSES_BUTTON_SHIFT;
 
-        
         const BUTTON_ALT = NCURSES_BUTTON_ALT;
 
-        
         const ALL_MOUSE_EVENTS = NCURSES_ALL_MOUSE_EVENTS;
 
-        
         const REPORT_MOUSE_POSITION = NCURSES_REPORT_MOUSE_POSITION;
     }
 }
-
-
 
 namespace NcursesObjects
 {
@@ -596,7 +273,6 @@ namespace NcursesObjects
         throw new \RuntimeException("Library <ncurses> in not loaded.");
     }
 
-    
     class Ncurses
     {
         const KEY_LF  = 10;
@@ -608,22 +284,18 @@ namespace NcursesObjects
         const CURSOR_NORMAL    = 1;
         const CURSOR_VISIBLE   = 2;
 
-        
         private $terminal;
 
-        
         public function __construct()
         {
             ncurses_init();
         }
 
-        
         public function __destruct()
         {
             ncurses_end();
         }
 
-        
         public function getTerminal()
         {
             if (is_null($this->terminal))
@@ -631,7 +303,6 @@ namespace NcursesObjects
             return $this->terminal;
         }
 
-        
         public function setEchoState($state)
         {
             if ($state)
@@ -641,7 +312,6 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function setNewLineTranslationState($state)
         {
             if ($state)
@@ -651,47 +321,40 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function setCursorState($state)
         {
             ncurses_curs_set($state);
             return $this;
         }
 
-        
         public function moveOutput($y, $x)
         {
             ncurses_move($y, $x);
             return $this;
         }
 
-        
         public function refresh()
         {
             ncurses_refresh();
             return $this;
         }
 
-        
         public function beep()
         {
             ncurses_beep();
             return $this;
         }
 
-        
         public function getCh()
         {
             return ncurses_getch();
         }
 
-        
         public function unGetCh($ch)
         {
             return ncurses_ungetch($ch);
         }
 
-        
         public function updatePanels()
         {
             ncurses_update_panels();
@@ -699,14 +362,12 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function insertChar($char)
         {
             ncurses_insch($char);
             return $this;
         }
 
-        
         public function insertDeleteLines($count)
         {
             ncurses_insdelln($count);
@@ -716,42 +377,35 @@ namespace NcursesObjects
     }
 }
 
-
-
 namespace NcursesObjects
 {
-    
+
     class Panel {
-        
+
         private $window;
-        
+
         private $panelResource;
 
-        
         public function __construct(Window $window) {
             $this->window = $window;
             $this->panelResource = ncurses_new_panel($window->getWindow());
         }
 
-        
         public function show() {
             ncurses_show_panel($this->panelResource);
             return $this;
         }
 
-        
         public function hide() {
             ncurses_hide_panel($this->panelResource);
             return $this;
         }
 
-        
         public function putOnTop() {
             ncurses_top_panel($this->panelResource);
             return $this;
         }
 
-        
         public function putOnBottom() {
             ncurses_bottom_panel($this->panelResource);
             return $this;
@@ -769,27 +423,22 @@ namespace NcursesObjects
     }
 }
 
-
-
 namespace NcursesObjects
 {
     class Terminal {
-        
+
         public function hasKey($keycode) {
             return ncurses_has_key($keycode);
         }
 
-        
         public function hasColors() {
             return ncurses_has_colors();
         }
 
-        
         public function hasIC() {
             return ncurses_has_ic();
         }
 
-        
         public function hasIL() {
             return ncurses_has_il();
         }
@@ -808,17 +457,15 @@ namespace NcursesObjects
     }
 }
 
-
-
 namespace NcursesObjects
 {
-    
+
     class Window {
-        
+
         private $windowResource;
-        
+
         private $panel;
-        
+
         private $cursorX;
         private $cursorY;
 
@@ -826,19 +473,16 @@ namespace NcursesObjects
         const BORDER_STYLE_DOUBLE = 2; 
         const BORDER_STYLE_BLOCK = 3; 
 
-        
         private $rows;
         private $columns;
         private $x;
         private $y;
 
-        
         protected $style;
         private $title = '';
         private $status = '';
         private $frame;
 
-        
         public function __construct($columns = 0, $rows = 0, $x = 0, $y = 0) {
             $this->x = $x;
             $this->y = $y;
@@ -853,19 +497,16 @@ namespace NcursesObjects
             ];
         }
 
-        
         public function __destruct() {
             if ($this->panel !== null)
                 $this->panel = null;
             ncurses_delwin($this->windowResource);
         }
 
-        
         public function getWindow() {
             return $this->windowResource;
         }
 
-        
         public function getSize(&$columns = null, &$rows = null) {
             ncurses_getmaxyx($this->windowResource, $rows, $columns);
             return array('columns' => $columns, 'rows' => $rows);
@@ -899,14 +540,12 @@ namespace NcursesObjects
             return $this->y;
         }
 
-        
         public function border($left = 0, $right = 0, $top = 0, $bottom = 0, $tl_corner = 0, $tr_corner = 0, $bl_corner = 0, $br_corner = 0) {
             ncurses_wborder($this->windowResource, $left, $right, $top, $bottom, $tl_corner, $tr_corner, $bl_corner, $br_corner);
             $this->frame['border'] = true;
             return $this;
         }
 
-        
         public function borderStyle($style) {
             if ($style == self::BORDER_STYLE_SOLID) {
                 $this->border();
@@ -918,13 +557,11 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function refresh() {
             ncurses_wrefresh($this->windowResource);
             return $this;
         }
 
-        
         public function title($title) {
             $this->moveCursor(1, 0);
             $this->title = " {$title} ";
@@ -932,7 +569,6 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function status($status) {
             $this->moveCursor(1, $this->rows -1 );
             $this->status = " {$status} ";
@@ -950,7 +586,6 @@ namespace NcursesObjects
             return $this->status;
         }
 
-        
         public function erase() {
             $this->frame = [
                 'draw' => [],
@@ -960,7 +595,6 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function moveCursor($x, $y) {
             $this->cursorX = $x;
             $this->cursorY = $y;
@@ -968,7 +602,6 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function drawStringHere($string, $attributes = 0) {
             ncurses_wattron($this->windowResource, $attributes);
             ncurses_waddstr($this->windowResource, $string);
@@ -977,13 +610,11 @@ namespace NcursesObjects
             return $this;
         }
 
-        
         public function makePanel() {
             $this->panel = new Panel($this);
             return $this;
         }
 
-        
         public function getPanel() {
             return $this->panel;
         }
@@ -1005,7 +636,6 @@ namespace NcursesObjects
             $this->refresh();
         }
 
-        
         static public function createCenteredOf(Window $parentWindow, $columns, $rows) {
             $parentWindow->getSize($max_columns, $max_rows);
             return new Window($columns, $rows, ($max_columns / 2 - $columns / 2), ($max_rows / 2 - $rows / 2));
@@ -1013,38 +643,26 @@ namespace NcursesObjects
     }
 }
 
-
-
 namespace NcursesObjects
 {
     class WindowStyle {
 
-        
         const BORDER_STYLE_SOLID = 'solid';
-        
         const BORDER_STYLE_DOUBLE = 'double';
-        
         const BORDER_STYLE_BLOCK = 'block';
-
-        
         protected $borderWidth = 1;
-
-        
         protected $borderStyle = 'solid';
 
-        
         public function setBorderStyle($style) {
             $enum = array(self::BORDER_STYLE_SOLID, self::BORDER_STYLE_DOUBLE, self::BORDER_STYLE_BLOCK);
             if (in_array($style, $enum))
                 $this->borderStyle = $style;
         }
 
-        
         public function getBorderStyle() {
             return $this->borderStyle;
         }
 
-        
         public function setBorderWidth($width) {
             $width = intval($width, 10);
             if ($width > 1) {
@@ -1052,64 +670,33 @@ namespace NcursesObjects
             }
         }
 
-        
         public function getBorderWidth() {
             return $this->borderWidth;
         }
     }
 }
 
-
-
 namespace Rakit\Curl {
     class Curl {
 
-        
         protected $curl;
-
-        
         protected $url;
-
-        
         protected $params = array();
-
-        
         protected $cookies = array();
-
-        
         protected $options = array();
-
-        
         protected $files = array();
-
-        
         protected $headers = array();
-
-        
         protected $limit_redirect_count = 0;
-
-        
         protected $redirect_urls = array();
-
-        
         protected $cookie_jar = null;
-
-        
         protected $closed = FALSE;
-
-        
         protected $error_message = null;
-
-        
         protected $errno = null;
-
-        
         public $response = null;
 
-        
         public function __construct($url, array $params = array())
         {
-            
+
             if ( ! extension_loaded('curl')) {
                 throw new \ErrorException('cURL library need PHP cURL extension');
             }
@@ -1124,7 +711,6 @@ namespace Rakit\Curl {
             $this->option(CURLOPT_SSL_VERIFYPEER, FALSE);
         }
 
-        
         public function timeout($time)
         {
             $this->option(CURLOPT_CONNECTTIMEOUT, $time);
@@ -1132,7 +718,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function auth($username, $password, $type = 'basic')
         {
             $auth_type = constant('CURLAUTH_' . strtoupper($type));
@@ -1143,7 +728,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function useragent($user_agent)
         {
             $this->option(CURLOPT_USERAGENT, $user_agent);
@@ -1151,7 +735,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function referer($referer)
         {
             $this->option(CURLOPT_REFERER, $referer);
@@ -1159,7 +742,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function option($option, $value)
         {
             $this->options[$option] = $value;
@@ -1167,13 +749,11 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function hasOption($option)
         {
             return array_key_exists($option, $this->options);
         }
 
-        
         public function proxy($url, $port = 80)
         {
             $this->option(CURLOPT_HTTPPROXYTUNNEL, true);
@@ -1181,7 +761,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function header($key, $value = null)
         {
             $this->headers[] = $value === null ? $key : $key.': '.$value;
@@ -1189,20 +768,17 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function getCurl()
         {
             return $this->curl;
         }
 
-        
         public function param($key, $value)
         {
             $this->params[$key] = $value;
             return $this;
         }
 
-        
         public function cookie($key, $value)
         {
             $this->cookies[$key] = $value;
@@ -1210,7 +786,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function addFile($key, $filepath, $mimetype='', $filename='')
         {
             $postfield = "@$filepath;filename="
@@ -1222,7 +797,6 @@ namespace Rakit\Curl {
             return $this;
         }
 
-        
         public function autoRedirect($count)
         {
             if(!is_int($count)) {
@@ -1232,7 +806,6 @@ namespace Rakit\Curl {
             $this->limit_redirect_count = $count;
         }
 
-        
         public function storeSession($file)
         {
             $this->option(CURLOPT_COOKIEJAR, $file);
@@ -1240,14 +813,12 @@ namespace Rakit\Curl {
             $this->cookie_jar = $file;
         }
 
-        
         public function ajax()
         {
             $this->header("X-Requested-With: XMLHttpRequest");
             return $this;
         }
 
-        
         public function get(array $data = array())
         {
             $params = array_merge($this->params, $data);
@@ -1260,7 +831,6 @@ namespace Rakit\Curl {
             return $this->execute();
         }
 
-        
         public function post(array $data = array())
         {
             $params = array_merge($this->params, $this->files, $data);
@@ -1272,7 +842,6 @@ namespace Rakit\Curl {
             return $this->execute();
         }
 
-        
         public function postRaw($data)
         {
             $this->option(CURLOPT_URL, $this->url);
@@ -1282,7 +851,6 @@ namespace Rakit\Curl {
             return $this->execute();
         }
 
-        
         public function put(array $data = array())
         {
             $params = array_merge($this->params, $data);
@@ -1295,7 +863,6 @@ namespace Rakit\Curl {
             return $this->execute();
         }
 
-        
         public function patch(array $data = array())
         {
             $params = array_merge($this->params, $this->files, $data);
@@ -1307,7 +874,6 @@ namespace Rakit\Curl {
             return $this->execute();
         }
 
-        
         public function delete(array $data = array())
         {
             $params = array_merge($this->params, $data);
@@ -1319,13 +885,11 @@ namespace Rakit\Curl {
             return $this->execute();
         }
 
-        
         public function getRedirectUrls()
         {
             return $this->redirect_urls;
         }
 
-        
         public function getFinalUrl()
         {
             if(count($this->redirect_urls) > 0) {
@@ -1335,7 +899,6 @@ namespace Rakit\Curl {
             return $this->url;
         }
 
-        
         protected function execute()
         {
             if(TRUE === $this->closed) {
@@ -1373,7 +936,6 @@ namespace Rakit\Curl {
             return $this->response;
         }
 
-        
         protected function redirect()
         {
             $redirect_url = $this->response->getHeader("location");
@@ -1385,62 +947,52 @@ namespace Rakit\Curl {
             $this->redirect_urls[] = $redirect_url;
         }
 
-        
         public function getErrno()
         {
             return $this->errno;
         }
 
-        
         public function getError()
         {
             return $this->getErrno();
         }
 
-        
         public function getErrorMessage()
         {
             return $this->error_message;
         }
 
-        
         protected function close()
         {
             curl_close($this->curl);
             $this->closed = TRUE;
         }
 
-        
         public static function doGet($url, array $data = array())
         {
             return static::make($url, $data)->get();
         }
 
-        
         public static function doPost($url, array $data = array())
         {
             return static::make($url, $data)->post();
         }
 
-        
         public static function doPut($url, array $data = array())
         {
             return static::make($url, $data)->put();
         }
 
-        
         public static function doPatch($url, array $data = array())
         {
             return static::make($url, $data)->patch();
         }
 
-        
         public static function doDelete($url, array $data = array())
         {
             return static::make($url, $data)->delete();
         }
 
-        
         public static function make($url, array $data = array())
         {
             return new static($url, $data);
@@ -1448,9 +1000,6 @@ namespace Rakit\Curl {
 
     }
 }
-
-
-
 
 namespace Rakit\Curl {
     class Response {
@@ -1631,7 +1180,6 @@ namespace Rakit\Curl {
     }
 }
 
-
 namespace { 
 
 class Text
@@ -1656,7 +1204,6 @@ class Text
         return $text;
     }
 
-    
     public static function startsWith($haystack, $needle)
     {
         if (is_array($needle)) {
@@ -1671,7 +1218,6 @@ class Text
         return (string)$needle === "" || strpos($haystack, (string)$needle) === 0;
     }
 
-    
     public static function endsWith($haystack, $needle)
     {
         if (is_array($needle)) {
@@ -1692,10 +1238,8 @@ class Text
     }
 }
 
-
-
 if (!function_exists('app')) {
-    
+
     function app($type = null) {
         static $gui;
         static $start;
@@ -1719,7 +1263,6 @@ if (!function_exists('app')) {
 if (!function_exists('debug_string_backtrace')) {
     function debug_string_backtrace($text = null, $config = null) {
 
-        
         $config = null === $config ? app('start')->getConfig() : $config;
 
         if (is_string($config)) {
@@ -1727,7 +1270,6 @@ if (!function_exists('debug_string_backtrace')) {
         } else {
             $file = $config->getLogsDir() . '/debug.log';
         }
-
 
         static $init;
 
@@ -1755,11 +1297,8 @@ if (!function_exists('debug_string_backtrace')) {
             $trace = ob_get_contents();
             ob_end_clean();
 
-            
-            
             $trace = preg_replace ('/^#0\s+' . __FUNCTION__ . "[^\n]*\n/", '', $trace, 1);
 
-            
             $trace = preg_replace ('/^#(\d+)/me', '\'#\' . ($1 - 1)', $trace);
 
             $trace = implode("\n", array_map(function ($n) {list($a) = explode('called at', $n); return trim($a);}, explode("\n", $trace)));
@@ -1773,9 +1312,8 @@ if (!function_exists('debug_string_backtrace')) {
     }
 }
 
-
 if (!function_exists('startsWith')) {
-    
+
     function startsWith($haystack, $needle)
     {
         if (is_array($needle)) {
@@ -1791,9 +1329,8 @@ if (!function_exists('startsWith')) {
     }
 }
 
-
 if (!function_exists('endsWith')) {
-    
+
     function endsWith($haystack, $needle)
     {
         if (is_array($needle)) {
@@ -1809,13 +1346,10 @@ if (!function_exists('endsWith')) {
     }
 }
 
-
-
 class FileINI {
 
     private $file;
 
-    
     public function __construct($path)
     {
         $this->file = $path;
@@ -1860,8 +1394,6 @@ class FileINI {
         return true;
     }
 }
-
-
 
 class Logs {
 
@@ -1953,15 +1485,12 @@ class Logs {
     }
 }
 
-
-
 class Buffer {
 
     private $size = 150;
     private $buffer;
     private $changes;
 
-    
     public function __construct()
     {
         $this->buffer  = [];
@@ -2009,13 +1538,10 @@ class Buffer {
     }
 }
 
-
-
 class History
 {
     private $history;
 
-    
     public function __construct()
     {
         $this->history = [];
@@ -2043,14 +1569,11 @@ class History
     }
 }
 
-
-
 class FileSystem {
 
     private $command;
     private $config;
 
-    
     public function __construct(Config $config, Command $command)
     {
         $this->command = $command;
@@ -2328,20 +1851,15 @@ class FileSystem {
     }
 }
 
-
-
 class Command
 {
     private $config;
 
-    
     public function __construct(Config $config)
     {
         $this->config = $config;
     }
 
-
-    
     public function run($cmd, $saveLog = null, $outputConsole = false)
     {
         if (null !== $saveLog && file_exists($saveLog)) {
@@ -2555,8 +2073,6 @@ class Command
     }
 }
 
-
-
 class Network {
 
     private static $isConnected;
@@ -2564,7 +2080,6 @@ class Network {
     private $command;
     private $config;
 
-    
     public function __construct(Config $config, Command $command)
     {
         $this->command = $command;
@@ -2609,14 +2124,11 @@ class Network {
     }
 }
 
-
-
 class System {
 
     private $command;
     private $config;
 
-    
     public function __construct(Config $config, Command $command)
     {
         $this->command = $command;
@@ -2793,25 +2305,21 @@ class System {
         }
     }
 
-    
     public function isMounted()
     {
         return $this->mounted;
     }
 
-    
     public function getFolder()
     {
         return $this->folder;
     }
 
-    
     public function getExtension()
     {
         return $this->extension;
     }
 
-    
     public function mount()
     {
         if (!$this->console->lock()) {
@@ -2843,7 +2351,6 @@ class System {
         return $this->mounted;
     }
 
-    
     public function umount()
     {
         if (!$this->console->lock()) {
@@ -2875,8 +2382,6 @@ class System {
     }
 }
 
-
-
 class Event
 {
     const EVENT_BEFORE_START_GAME   = 'before-start';
@@ -2888,7 +2393,6 @@ class Event
 
     protected $events;
 
-    
     public function __construct(Config $config, Command $command)
     {
         $this->command = $command;
@@ -2997,8 +2501,6 @@ class Event
         return $result;
     }
 }
-
-
 
 class Config {
 
@@ -3131,7 +2633,6 @@ class Config {
         return null === $field ? $this->config[$section] : $this->config[$section][$field];
     }
 
-    
     public function getConfig()
     {
         $this->load();
@@ -3139,7 +2640,6 @@ class Config {
         return $this->config;
     }
 
-    
     public function save()
     {
         $update = new Update($this, new Command($this));
@@ -3283,7 +2783,6 @@ class Config {
         return $this->wine('DRIVE_C');
     }
 
-    
     public function getConfigFile()
     {
         if (null === $this->configPath) {
@@ -3444,8 +2943,6 @@ class Config {
     }
 }
 
-
-
 class Update
 {
     private $version = '0.85';
@@ -3454,7 +2951,6 @@ class Update
     private $network;
     private $system;
 
-    
     public function __construct(Config $config, Command $command)
     {
         $this->command = $command;
@@ -3475,23 +2971,16 @@ class Update
 
     public function init()
     {
-        
+
         if ($this->autoupdate()) {
             $this->restart();
         }
 
-
-        
         (new DXVK($this->config, $this->command, $this->network))->update();
 
-
-        
         (new D9VK($this->config, $this->command, $this->network, app('start')->getFileSystem(), app('start')->getWine()))->update();
 
-
-        
         $this->updateReadme();
-
 
         $restart = $this->config->getRootDir() . '/restart';
 
@@ -3537,7 +3026,7 @@ class Update
                 $readme = $this->network->get($this->config->getRepositoryUrl() . '/README.md');
 
                 if ($readme) {
-                    
+
                     file_put_contents($this->config->getRootDir() . '/README.md', $readme);
 
                     return true;
@@ -3548,7 +3037,6 @@ class Update
         return false;
     }
 
-    
     public function updateConfig($config = null)
     {
         if (null === $config) {
@@ -3696,7 +3184,6 @@ class Update
             file_put_contents($this->config->getRootDir() . '/start', $newStart);
             $this->command->run('chmod +x ' . Text::quoteArgs($this->config->getRootDir() . '/start'));
 
-            
             $this->updateReadme(false, true);
 
             return true;
@@ -3844,8 +3331,6 @@ class Update
     }
 }
 
-
-
 class Monitor {
 
     private $config;
@@ -3854,7 +3339,6 @@ class Monitor {
     private $monitors;
     private $jsonPath;
 
-    
     public function __construct(Config $config, Command $command)
     {
         $this->command  = $command;
@@ -3989,8 +3473,6 @@ class Monitor {
     }
 }
 
-
-
 class WinePrefix {
 
     private $command;
@@ -4007,7 +3489,6 @@ class WinePrefix {
     private $buffer;
     private $created = false;
 
-    
     public function __construct(Config $config, Command $command, Event $event)
     {
         $this->command  = $command;
@@ -4065,27 +3546,19 @@ class WinePrefix {
             @file_put_contents($this->config->wine('WINEPREFIX') . '/version', $this->wine->version());
             app()->getCurrentScene()->setProgress(20);
 
-
-            
             foreach ($this->updateReplaces() as $replace) {
                 $this->log($replace);
             }
             app()->getCurrentScene()->setProgress(25);
 
-
-            
             if ($this->updateSandbox(true)) {
                 $this->log('Set sandbox.');
             }
             app()->getCurrentScene()->setProgress(30);
 
-
-            
             $this->createGameDirectory();
             app()->getCurrentScene()->setProgress(33);
 
-
-            
             $regs = array_merge(
                 app('start')->getPatch()->getRegistryFiles(),
                 $this->config->getRegistryFiles()
@@ -4093,15 +3566,11 @@ class WinePrefix {
             app('start')->getRegistry()->apply($regs, function ($text) {$this->log($text);});
             app()->getCurrentScene()->setProgress(35);
 
-
-            
             if (app('start')->getPatch()->apply()) {
                 $this->log('Apply patches');
             }
             app()->getCurrentScene()->setProgress(37);
 
-
-            
             if ($this->config->getBool('script', 'dumbxinputemu')) {
                 app('start')->getPatch()->create(function () {
                     (new Dumbxinputemu($this->config, $this->command, $this->fs, $this->wine))->update(function ($text) {$this->log($text);});
@@ -4109,8 +3578,6 @@ class WinePrefix {
             }
             app()->getCurrentScene()->setProgress(40);
 
-
-            
             if ($this->config->getBool('script', 'faudio')) {
                 app('start')->getPatch()->create(function () {
                     (new FAudio($this->config, $this->command, $this->fs, $this->wine))->update(function ($text) {$this->log($text);});
@@ -4118,38 +3585,26 @@ class WinePrefix {
             }
             app()->getCurrentScene()->setProgress(45);
 
-
-            
             (new Fixes($this->config, $this->command, $this->fs, $this->wine))->update(function ($text) {$this->log($text);});
             app()->getCurrentScene()->setProgress(50);
-
 
             if ($winetricksInstall = $this->config->get('script', 'winetricks_to_install')) {
                 $this->log("Winetricks install \"{$winetricksInstall}\".");
                 $this->wine->winetricks(array_filter(explode(' ', $winetricksInstall)));
             }
 
-            
             $this->updateDlls();
             app()->getCurrentScene()->setProgress(55);
 
-
-            
             $this->updateCsmt();
             app()->getCurrentScene()->setProgress(70);
 
-
-            
             $this->updatePulse();
             app()->getCurrentScene()->setProgress(75);
 
-
-            
             $this->updateWinVersion();
             app()->getCurrentScene()->setProgress(85);
 
-
-            
             if ($this->config->isDxvk()) {
                 app('start')->getPatch()->create(function () {
                     (new DXVK($this->config, $this->command, $this->network))->update(function ($text) {$this->log($text);});
@@ -4157,8 +3612,6 @@ class WinePrefix {
             }
             app()->getCurrentScene()->setProgress(87);
 
-
-            
             if ($this->config->isD9vk()) {
                 app('start')->getPatch()->create(function () {
                     (new D9VK($this->config, $this->command, $this->network, app('start')->getFileSystem(), app('start')->getWine()))
@@ -4167,8 +3620,6 @@ class WinePrefix {
             }
             app()->getCurrentScene()->setProgress(90);
 
-
-            
             $this->event->createPrefix();
             app()->getCurrentScene()->setProgress(95);
             $this->event->gpu();
@@ -4187,41 +3638,23 @@ class WinePrefix {
             exit(0);
         }
 
-
-        
         $this->update->updateConfig();
         (new DXVK($this->config, $this->command, $this->network))->updateDxvkConfig();
 
-
-        
         $this->createGameDirectory();
 
-
-        
         $this->updateCsmt();
 
-
-        
         (new Dumbxinputemu($this->config, $this->command, $this->fs, $this->wine))->update(function ($text) {$this->log($text);});
 
-
-        
         (new FAudio($this->config, $this->command, $this->fs, $this->wine))->update(function ($text) {$this->log($text);});
 
-
-        
         (new Fixes($this->config, $this->command, $this->fs, $this->wine))->update(function ($text) {$this->log($text);});
 
-
-        
         $this->updateDlls();
 
-
-        
         $this->updatePulse();
 
-
-        
         $this->updateWinVersion();
     }
 
@@ -4259,7 +3692,6 @@ class WinePrefix {
             return [];
         }
 
-        
         $dlls     = [];
         $isDll32  = file_exists($this->config->getDllsDir()) && file_exists($this->config->getWineSystem32Folder());
         $isDll64  = file_exists($this->config->getDlls64Dir()) && file_exists($this->config->getWineSyswow64Folder());
@@ -4307,7 +3739,7 @@ class WinePrefix {
 
     public function createGameDirectory()
     {
-        
+
         if (!file_exists($this->config->getPrefixGameFolder()) && file_exists($this->config->wine('WINEPREFIX'))) {
 
             $data = $this->fs->relativePath($this->config->getDataDir());
@@ -4328,14 +3760,11 @@ class WinePrefix {
         return $this->created;
     }
 
-    
     public function setWine($wine)
     {
         $this->wine = $wine;
     }
 }
-
-
 
 class GameInfo {
 
@@ -4345,7 +3774,6 @@ class GameInfo {
     private $buffer;
     private $created = false;
 
-    
     public function __construct(Config $config, Command $command)
     {
         if (posix_geteuid() === 0) {
@@ -4410,8 +3838,6 @@ class GameInfo {
 
             $readme = 'readme.txt';
 
-
-            
             file_put_contents(
                 $this->config->getGameInfoDir() . "/{$readme}",
                 "Эта директория необходима для работы скрипта.
@@ -4428,19 +3854,15 @@ regs - файлы реестра windows (необязательная дире�
             );
             $this->log('Create file   "' . $this->config->getGameInfoDir() . "/{$readme}" . '"');
 
-            
             file_put_contents($this->config->getConfigFile(), $this->config->getDefaultConfig());
             $this->log('Create file   "' . $this->config->getConfigFile() . '"');
 
-            
             file_put_contents(
                 $this->config->getDataDir() . "/{$readme}",
                 "Здесь должна находиться игра."
             );
             $this->log('Create file   "' . $this->config->getDataDir() . "/{$readme}" . '"');
 
-
-            
             file_put_contents(
                 $this->config->getDllsDir() . "/{$readme}",
                 "В эту директорию нужно класть необходимые игре DLL файлы. Если таких нет
@@ -4448,8 +3870,6 @@ regs - файлы реестра windows (необязательная дире�
             );
             $this->log('Create file   "' . $this->config->getDllsDir() . "/{$readme}" . '"');
 
-
-            
             file_put_contents(
                 $this->config->getDlls64Dir() . "/{$readme}",
                 "В эту директорию нужно класть необходимые игре DLL файлы. Если таких нет
@@ -4457,16 +3877,12 @@ regs - файлы реестра windows (необязательная дире�
             );
             $this->log('Create file   "' . $this->config->getDlls64Dir() . "/{$readme}" . '"');
 
-
-            
             file_put_contents(
                 $this->config->getRegistryDir() . "/{$readme}",
                 "Здесь должны находиться .reg файлы."
             );
             $this->log('Create file   "' . $this->config->getRegistryDir() . "/{$readme}" . '"');
 
-
-            
             file_put_contents(
                 $this->config->getAdditionalDir() . "/{$readme}",
                 "Специфичные для игры настройки. Класть в директории dir_1, dir_2, dir_3
@@ -4480,8 +3896,6 @@ regs - файлы реестра windows (необязательная дире�
             );
             $this->log('Create file   "' . $this->config->getAdditionalDir() . "/{$readme}" . '"');
 
-
-            
             file_put_contents(
                 $this->config->getAdditionalDir() . '/path.txt',
                 "users/--REPLACE_WITH_USERNAME--/Мои документы
@@ -4498,8 +3912,6 @@ users/--REPLACE_WITH_USERNAME--/Documents"
             $this->log('Create folder "' . $this->config->getAdditionalDir() . '/dir_1' . '"');
             $this->log('Create folder "' . $this->config->getAdditionalDir() . '/dir_2' . '"');
 
-
-            
             file_put_contents(
                 $this->config->getAdditionalDir() . "/dir_1/{$readme}",
                 "Здесь должно находиться содержимое директории dir_1."
@@ -4508,35 +3920,27 @@ users/--REPLACE_WITH_USERNAME--/Documents"
 
             app()->getCurrentScene()->setProgress(5);
 
-            
             if ((new Update($this->config, $this->command))->updateReadme(true)) {
                 $this->log('Create file   "' . $this->config->getRootDir() . '/README.md' . '"');
             }
 
-
-            
             file_put_contents(
                 $this->config->getHooksDir() . '/after.sh',
                 '#' ."!/bin/sh\necho \"After!\""
             );
             $this->log('Create file   "' . $this->config->getHooksDir() . '/after.sh' . '"');
 
-
-            
             file_put_contents(
                 $this->config->getHooksDir() . '/before.sh',
                 '#' ."!/bin/sh\necho \"Before!\""
             );
             $this->log('Create file   "' . $this->config->getHooksDir() . '/before.sh' . '"');
 
-
-            
             file_put_contents(
                 $this->config->getHooksDir() . '/create.sh',
                 '#' ."!/bin/sh\necho \"Create prefix!\"\ncd ../../\n./start unlock\n./start winetricks wmp9"
             );
             $this->log('Create file   "' . $this->config->getHooksDir() . '/create.sh' . '"');
-
 
             if (!file_exists($this->config->getHooksGpuDir())) {
                 if (!mkdir($this->config->getHooksGpuDir(), 0775, true) && !is_dir($this->config->getHooksGpuDir())) {
@@ -4545,23 +3949,18 @@ users/--REPLACE_WITH_USERNAME--/Documents"
             }
             $this->log('Create folder "' . $this->config->getHooksGpuDir() . '"');
 
-            
             file_put_contents(
                 $this->config->getHooksGpuDir() . '/amd.sh',
                 '#' ."!/bin/sh\necho \"AMD GPU hook!\""
             );
             $this->log('Create file   "' . $this->config->getHooksGpuDir() . '/amd.sh' . '"');
 
-
-            
             file_put_contents(
                 $this->config->getHooksGpuDir() . '/nvidia.sh',
                 '#' ."!/bin/sh\necho \"NVIDIA GPU hook!\""
             );
             $this->log('Create file   "' . $this->config->getHooksGpuDir() . '/nvidia.sh' . '"');
 
-
-            
             file_put_contents(
                 $this->config->getHooksGpuDir() . '/intel.sh',
                 '#' ."!/bin/sh\necho \"Intel GPU hook!\""
@@ -5268,8 +4667,6 @@ apt-get install wine32 wine binutils unzip cabextract p7zip-full unrar-free wget
     }
 }
 
-
-
 class Icon
 {
     private $config;
@@ -5281,7 +4678,6 @@ class Icon
     private $local;
     private $title;
 
-    
     public function __construct(Config $config, Command $command, System $system)
     {
         $this->command = $command;
@@ -5367,7 +4763,6 @@ class Icon
         return $icons;
     }
 
-    
     public function findExistIcons()
     {
         $result = [];
@@ -5386,7 +4781,6 @@ class Icon
         return $result;
     }
 
-    
     public function findDir()
     {
         foreach ($this->folders as $folder) {
@@ -5398,7 +4792,6 @@ class Icon
         return '';
     }
 
-    
     public function findPng()
     {
         $rootDir = $this->config->getRootDir();
@@ -5422,15 +4815,12 @@ Categories=Game";
     }
 }
 
-
-
 class Pack
 {
     private $command;
     private $config;
     private $fs;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs)
     {
         $this->config  = $config;
@@ -5517,7 +4907,7 @@ class Pack
         $findMount = null;
 
         foreach ($mountes as $mount) {
-            
+
             if ($mount->getFolder() === $folder) {
                 $findMount = $mount;
                 break;
@@ -5537,7 +4927,7 @@ class Pack
         $mountes = app('start')->getMountes();
 
         foreach ($mountes as $mount) {
-            
+
             if ($mount->isMounted()) {
                 $result[] = $mount->getFolder() . '.' .$mount->getExtension();
             }
@@ -5547,8 +4937,6 @@ class Pack
     }
 }
 
-
-
 class Symlink
 {
     private $command;
@@ -5556,7 +4944,6 @@ class Symlink
     private $fs;
     private $extensions;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs)
     {
         $this->config     = $config;
@@ -5565,7 +4952,6 @@ class Symlink
         $this->extensions = ['cfg', 'conf', 'ini', 'inf', 'log', 'sav', 'save', 'config', 'con', 'profile', 'ltx'];
     }
 
-    
     public function getExtensions()
     {
         return $this->extensions;
@@ -5632,7 +5018,7 @@ class Symlink
         }
 
         foreach (app('start')->getMountes() as $mount) {
-            
+
             $mount->umount();
         }
 
@@ -5654,8 +5040,6 @@ chmod +x ./start"
     }
 }
 
-
-
 class Task
 {
     private $command;
@@ -5670,7 +5054,6 @@ class Task
     private $system;
     private $update;
 
-    
     public function __construct(Config $config)
     {
         $this->config  = clone $config;
@@ -5768,7 +5151,6 @@ class Task
         return $this;
     }
 
-    
     public function run($callback = null)
     {
         app('start')->getPlugins()->setConfig($this->config);
@@ -5828,8 +5210,6 @@ class Task
     }
 }
 
-
-
 class Console
 {
     private $config;
@@ -5839,7 +5219,6 @@ class Console
     private $log;
     private $gui = false;
 
-    
     public function __construct(Config $config, Command $command, System $system, Logs $log)
     {
         $this->config  = $config;
@@ -5923,7 +5302,6 @@ class Console
 
             (new Monitor($this->config, $this->command))->resolutionsRestore();
 
-            
             $config = app('start')->getConfig();
 
             $configs = $config->findConfigsPath();
@@ -5961,7 +5339,6 @@ class Console
                 exit(0);
             }
 
-            
             $config = $item['config'];
 
             $task = new Task($config);
@@ -6007,8 +5384,6 @@ class Console
     }
 }
 
-
-
 class Dialog
 {
     private $type;
@@ -6019,7 +5394,6 @@ class Dialog
     private $text;
     private $columns;
 
-    
     public function __construct()
     {
         $this->type    = '--info';
@@ -6149,8 +5523,6 @@ class Dialog
     }
 }
 
-
-
 class YandexDisk
 {
     private $url;
@@ -6161,7 +5533,6 @@ class YandexDisk
     private $parent;
     private $currentPath;
 
-    
     public function __construct($url, $parent = null)
     {
         $this->url = $url;
@@ -6234,7 +5605,6 @@ class YandexDisk
         }
     }
 
-    
     public function getParent()
     {
         return $this->parent;
@@ -6378,14 +5748,11 @@ class YandexDisk
     }
 }
 
-
-
 class Lutris
 {
     private $url;
     private $data;
 
-    
     public function __construct()
     {
         $this->url = 'https:
@@ -6452,13 +5819,10 @@ class Lutris
     }
 }
 
-
-
 class PlayOnLinux
 {
     private $data;
 
-    
     public function __construct()
     {
         $this->data = [];
@@ -6591,8 +5955,6 @@ class PlayOnLinux
     }
 }
 
-
-
 class WineDownloader
 {
     private $command;
@@ -6602,10 +5964,8 @@ class WineDownloader
     private $isPress;
     private $result = '';
 
-    
     private $scene;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs, Pack $pack)
     {
         $this->command = $command;
@@ -6986,8 +6346,6 @@ class WineDownloader
     }
 }
 
-
-
 class Dumbxinputemu
 {
     private $config;
@@ -6999,7 +6357,6 @@ class Dumbxinputemu
     private $data;
     private $init;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs, Wine $wine)
     {
         $this->command = $command;
@@ -7111,7 +6468,6 @@ class Dumbxinputemu
         return '';
     }
 
-    
     public function update($logCallback = null)
     {
         if (!$this->config->getBool('script', 'dumbxinputemu') || !file_exists($this->config->getPrefixFolder())) {
@@ -7192,7 +6548,6 @@ class Dumbxinputemu
         return $fileName;
     }
 
-    
     public function update($logCallback = null)
     {
         if (!$this->config->getBool('script', 'faudio') || !file_exists($this->config->getPrefixFolder())) {
@@ -7234,7 +6589,6 @@ class Dumbxinputemu
         $this->version = $this->config->wine('DRIVE_C') . '/fixes';
     }
 
-    
     public function update($logCallback = null)
     {
         if (!file_exists($this->config->getPrefixFolder())) {
@@ -7244,13 +6598,6 @@ class Dumbxinputemu
         $isUpdated = false;
 
         $fixes = [
-
-
-
-
-
-
-
 
             'focus',
             'nocrashdialog',
@@ -7309,7 +6656,6 @@ class Dumbxinputemu
         return $isUpdated;
     }
 
-    
     public function ddrawUp($logCallback = null)
     {
         $this->register('dciman32', 'native', $logCallback);
@@ -7335,7 +6681,6 @@ class Dumbxinputemu
         $this->wine->winetricks(['devenum']);
     }
 
-    
     public function ddrawDown($logCallback = null)
     {
         $this->unregister('dciman32', $logCallback);
@@ -7345,7 +6690,6 @@ class Dumbxinputemu
         $this->fs->rm($this->config->getDllsDir() . '/ddraw.dll');
     }
 
-    
     public function installersUp($logCallback = null)
     {
         if ($logCallback) {
@@ -7354,7 +6698,6 @@ class Dumbxinputemu
         $this->wine->winetricks(['gdiplus', 'mfc42']);
     }
 
-    
     public function d3dx9Up($logCallback = null)
     {
         if ($logCallback) {
@@ -7363,7 +6706,6 @@ class Dumbxinputemu
         $this->wine->winetricks(['d3dx9', 'd3dcompiler_43']);
     }
 
-    
     public function internetUp($logCallback = null)
     {
         if ($logCallback) {
@@ -7372,7 +6714,6 @@ class Dumbxinputemu
         $this->wine->winetricks(['winhttp', 'wininet', 'directplay']);
     }
 
-    
     public function introUp($logCallback = null)
     {
         $items = [
@@ -7400,99 +6741,83 @@ class Dumbxinputemu
         $this->wine->winetricks($items);
     }
 
-    
     public function xactUp($logCallback = null)
     {
         $this->wine->winetricks(['xact']);
     }
 
-    
     public function physxUp($logCallback = null)
     {
         $this->wine->winetricks(['physx']);
     }
 
-    
     public function fontUp($logCallback = null)
     {
         $this->wine->winetricks(['allfonts']);
     }
 
-    
     public function focusUp($logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\X11 Driver', '/v', 'GrabFullscreen', '/d', 'Y', '/f']);
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\X11 Driver', '/v', 'UseTakeFocus', '/d', 'N', '/f']);
     }
 
-    
     public function focusDown($logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\X11 Driver', '/v', 'GrabFullscreen', '/f']);
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\X11 Driver', '/v', 'UseTakeFocus', '/f']);
     }
 
-    
     public function nocrashdialogUp($logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\WineDbg', '/v', 'ShowCrashDialog', '/t', 'REG_DWORD', '/d', '00000000', '/f']);
     }
 
-    
     public function nocrashdialogDown($logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\WineDbg', '/v', 'ShowCrashDialog', '/f']);
     }
 
-    
     public function cfcUp($logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'CheckFloatConstants', '/d', 'enabled', '/f']);
     }
 
-    
     public function cfcDown($logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'CheckFloatConstants', '/f']);
     }
 
-    
     public function ddrUp($logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'DirectDrawRenderer', '/d', $this->config->get('fixes', 'ddr'), '/f']);
     }
 
-    
     public function ddrDown($logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'DirectDrawRenderer', '/f']);
     }
 
-    
     public function glslUp($logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'UseGLSL', '/d', 'disabled', '/f']);
     }
 
-    
     public function glslDown($logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'UseGLSL', '/f']);
     }
 
-    
     public function ormUp($logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'OffscreenRenderingMode', '/d', $this->config->get('fixes', 'orm'), '/f']);
     }
 
-    
     public function ormDown($logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\Direct3D', '/v', 'OffscreenRenderingMode', '/f']);
     }
 
-    
     public function register($file, $type = 'native', $logCallback = null)
     {
         $this->wine->run(['reg', 'add', 'HKEY_CURRENT_USER\\Software\\Wine\\DllOverrides', '/v', $file, '/d', $type, '/f']);
@@ -7502,7 +6827,6 @@ class Dumbxinputemu
         }
     }
 
-    
     public function unregister($file, $logCallback = null)
     {
         $this->wine->run(['reg', 'delete', 'HKEY_CURRENT_USER\\Software\\Wine\\DllOverrides', '/v', $file, '/f']);
@@ -7512,8 +6836,6 @@ class Dumbxinputemu
         }
     }
 }
-
-
 
 class Snapshot
 {
@@ -7530,8 +6852,6 @@ class Snapshot
     private $shapshotBeforeDir;
     private $patchDir;
 
-
-    
     public function __construct(Config $config, Command $command, FileSystem $fs, Wine $wine, Replaces $replaces, System $system)
     {
         $this->command  = $command;
@@ -7614,7 +6934,6 @@ class Snapshot
         return $this->replaces->replaceToTemplateByString($text);
     }
 
-    
     private function getRegeditInserted($diff, &$compare)
     {
         $sections = array_filter($diff->getFile2Data(), function ($line) { return Text::startsWith($line[0], '['); });
@@ -7682,8 +7001,6 @@ class Snapshot
     }
 }
 
-
-
 class Patch
 {
     private $config;
@@ -7695,7 +7012,6 @@ class Patch
     private $index = 0;
     private $runnable = false;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs, Wine $wine, Snapshot $snapshot, WinePrefix $prefix)
     {
         $this->command  = $command;
@@ -7713,7 +7029,6 @@ class Patch
         return false === $this->runnable && $this->config->isGenerationPatchesMode();
     }
 
-    
     public function create($callback)
     {
         gc_collect_cycles();
@@ -7860,8 +7175,6 @@ class Patch
     }
 }
 
-
-
 class Replaces
 {
     private $config;
@@ -7876,7 +7189,6 @@ class Replaces
     private $userName;
     private $hostname;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs, System $system, Monitor $monitor)
     {
         $this->command  = $command;
@@ -7995,29 +7307,24 @@ class Replaces
         );
     }
 
-    
     public function getHeight()
     {
         $this->init();
         return $this->height;
     }
 
-    
     public function getWidth()
     {
         $this->init();
         return $this->width;
     }
 
-    
     public function getUserName()
     {
         $this->init();
         return $this->userName;
     }
 }
-
-
 
 class Registry
 {
@@ -8027,7 +7334,6 @@ class Registry
     private $wine;
     private $replaces;
 
-    
     public function __construct(Config $config, Command $command, FileSystem $fs, Wine $wine, Replaces $replaces)
     {
         $this->command  = $command;
@@ -8037,7 +7343,6 @@ class Registry
         $this->replaces = $replaces;
     }
 
-    
     public function apply($files, $callbackLog = null)
     {
         $regs  = ['Windows Registry Editor Version 5.00', ''];
@@ -8076,28 +7381,25 @@ class Registry
     }
 }
 
-
-
 class Plugins
 {
-    
+
     private $config;
-    
+
     private $command;
-    
+
     private $event;
-    
+
     private $fs;
-    
+
     private $replaces;
-    
+
     private $system;
-    
+
     private $monitor;
-    
+
     protected $plugins;
 
-    
     public function __construct(Event $event, Config $config, Command $command, FileSystem $fs, System $system, Replaces $replaces, Monitor $monitor)
     {
         $this->command  = $command;
@@ -8118,8 +7420,6 @@ class Plugins
         return $this->getClassNamespaceFromFile($filePathName) . '\\' . $this->getClassNameFromFile($filePathName);
     }
 
-
-    
     public function getClassObjectFromFile($filePathName)
     {
         $classString = $this->getClassFullNameFromFile($filePathName);
@@ -8141,8 +7441,6 @@ class Plugins
         return $object;
     }
 
-
-    
     protected function getClassNamespaceFromFile($filePathName)
     {
         $src          = file_get_contents($filePathName);
@@ -8155,7 +7453,7 @@ class Plugins
         while ($i < $count) {
             $token = $tokens[$i];
             if (is_array($token) && $token[0] === T_NAMESPACE) {
-                
+
                 while (++$i < $count) {
                     if ($tokens[$i] === ';') {
                         $namespace_ok = true;
@@ -8175,7 +7473,6 @@ class Plugins
         }
     }
 
-    
     protected function getClassNameFromFile($filePathName)
     {
         $php_code = file_get_contents($filePathName);
@@ -8193,15 +7490,12 @@ class Plugins
     }
 }
 
-
-
 class Driver
 {
     private $config;
     private $command;
     private $system;
 
-    
     public function __construct(Config $config, Command $command, System $system)
     {
         $this->config  = $config;
@@ -8348,15 +7642,12 @@ class Driver
     }
 }
 
-
-
 class DXVK
 {
     private $config;
     private $command;
     private $network;
 
-    
     public function __construct(Config $config, Command $command, Network $network)
     {
         $this->command = $command;
@@ -8390,7 +7681,6 @@ class DXVK
         return $version;
     }
 
-    
     public function update($logCallback = null)
     {
         if (!Network::isConnected() || !$this->config->isDxvk() || !file_exists($this->config->wine('WINEPREFIX'))) {
@@ -8495,8 +7785,6 @@ class DXVK
     }
 }
 
-
-
 class D9VK
 {
     private $config;
@@ -8505,7 +7793,6 @@ class D9VK
     private $fs;
     private $wine;
 
-    
     public function __construct(Config $config, Command $command, Network $network, FileSystem $fs, Wine $wine)
     {
         $this->command = $command;
@@ -8541,7 +7828,6 @@ class D9VK
         return $version;
     }
 
-    
     public function getRepoData()
     {
         static $data;
@@ -8553,7 +7839,6 @@ class D9VK
         return $data;
     }
 
-    
     public function update($logCallback = null)
     {
         if (!Network::isConnected() || !$this->config->isD9vk() || !file_exists($this->config->wine('WINEPREFIX'))) {
@@ -8596,7 +7881,6 @@ class D9VK
         return false;
     }
 
-    
     public function install($version = null, $logCallback = null)
     {
         $releases = $this->getList();
@@ -8635,7 +7919,6 @@ class D9VK
         return $releases;
     }
 
-    
     public function getLatest()
     {
         $releases = $this->getList();
@@ -8650,30 +7933,27 @@ class D9VK
     }
 }
 
-
-
 abstract class AbstractPlugin
 {
-    
+
     protected $event;
-    
+
     protected $config;
-    
+
     protected $command;
-    
+
     protected $fs;
-    
+
     protected $system;
-    
+
     protected $replaces;
-    
+
     protected $monitor;
-    
+
     public $title = '';
-    
+
     public $description = '';
 
-    
     public function __construct(Event $event, Config $config, Command $command, FileSystem $fs, System $system, Replaces $replaces, Monitor $monitor)
     {
         $this->event    = $event;
@@ -8695,15 +7975,12 @@ abstract class AbstractPlugin
     }
 }
 
-
-
 class ControllerGUI {
 
     private $ncurses;
     private $scenes;
     private $initPress = false;
 
-    
     public function  __construct()
     {
         $this->ncurses = new NcursesObjects\Ncurses;
@@ -8734,7 +8011,6 @@ class ControllerGUI {
         }
     }
 
-
     public function end()
     {
         ncurses_end();
@@ -8754,7 +8030,7 @@ class ControllerGUI {
     {
         foreach ($this->getScenes() as $scene) {
             foreach ($scene->getWidgets() as $widget) {
-                
+
                 $widget->hide();
                 $widget->destruct();
 
@@ -8804,7 +8080,7 @@ class ControllerGUI {
 
             $pressToScene = true;
             foreach ($scene->getWidgets() as $widget) {
-                
+
                 if ($widget->isActive()) {
                     if ($widget->pressKey($key) === false) {
                         return;
@@ -8821,55 +8097,46 @@ class ControllerGUI {
         }
     }
 
-    
     public function getMainScene()
     {
         return $this->getScenes('main');
     }
 
-    
     public function getPrefixScene()
     {
         return $this->getScenes('prefix');
     }
 
-    
     public function getGameInfoScene()
     {
         return $this->getScenes('gameInfo');
     }
 
-    
     public function getCheckDependenciesScene()
     {
         return $this->getScenes('check');
     }
 
-    
     public function getToolsScene()
     {
         return $this->getScenes('tools');
     }
 
-    
     public function getWineScene()
     {
         return $this->getScenes('wine');
     }
 
-    
     public function getTweaksScene()
     {
         return $this->getScenes('tweaks');
     }
 
-    
     public function getConfigScene()
     {
         return $this->getScenes('config');
     }
 
-    
     public function getCurrentScene()
     {
         foreach ($this->getScenes() as $scene) {
@@ -8936,8 +8203,6 @@ class ControllerGUI {
     }
 }
 
-
-
 abstract class AbstractScene {
 
     protected $window;
@@ -8948,7 +8213,6 @@ abstract class AbstractScene {
 
     private $changeWidgetActive;
 
-    
     public function __construct()
     {
         $this->window  = new NcursesObjects\Window;
@@ -8988,7 +8252,6 @@ abstract class AbstractScene {
         return $this;
     }
 
-    
     public function getWindow()
     {
         return $this->window;
@@ -8996,7 +8259,7 @@ abstract class AbstractScene {
 
     public function addWidget($widget)
     {
-        
+
         $this->widgets[] = $widget;
         $widget->onChangeActiveEvent($this->changeWidgetActive);
 
@@ -9005,7 +8268,7 @@ abstract class AbstractScene {
 
     public function removeWidget($widget)
     {
-        
+
         $widget->offChangeActiveEvent($this->changeWidgetActive);
         $this->widgets = array_filter($this->widgets, function ($item) use (&$widget) {return $item !== $widget;});
     }
@@ -9046,12 +8309,11 @@ abstract class AbstractScene {
         $current = $this->history->current();
 
         foreach ($this->widgets as $widget) {
-            
+
             $widget->offChangeActiveEvent($this->changeWidgetActive);
         }
 
         foreach ($this->getWidgets() as $widget) {
-            
 
             if ($widget === $current) {
                 $widget->setActive(true);
@@ -9061,7 +8323,7 @@ abstract class AbstractScene {
         }
 
         foreach ($this->widgets as $widget) {
-            
+
             $widget->onChangeActiveEvent($this->changeWidgetActive);
         }
     }
@@ -9077,17 +8339,15 @@ abstract class AbstractScene {
     }
 }
 
-
-
 class MainScene extends AbstractScene
 {
     private $selectIndex = 0;
 
     public function render()
     {
-        
+
         $config = app('start')->getConfig();
-        
+
         $update = app('start')->getUpdate();
 
         $this->window
@@ -9113,7 +8373,7 @@ class MainScene extends AbstractScene
 
     public function renderMenu()
     {
-        
+
         $config = app('start')->getConfig();
 
         $configs = $config->findConfigsPath();
@@ -9219,7 +8479,6 @@ class MainScene extends AbstractScene
                 $select->onEnterEvent(function ($type) use (&$select, &$item) {
                     $this->removeWidget($select->hide());
 
-                    
                     $config = $item['config'];
 
                     $task = new Task($config);
@@ -9243,14 +8502,12 @@ class MainScene extends AbstractScene
     public function pressKey($key) {}
 }
 
-
-
 class PrefixScene extends AbstractScene
 {
     private $updateTextCallable;
-    
+
     private $print;
-    
+
     private $progressBar;
 
     public function show()
@@ -9287,7 +8544,6 @@ class PrefixScene extends AbstractScene
             ->status($log)
             ->refresh();
 
-
         $this->progressBar = $this->addWidget(new ProgressBarWidget($this->window));
         $this->progressBar
             ->offset(mb_strlen($log) + 2, 3)
@@ -9313,14 +8569,12 @@ class PrefixScene extends AbstractScene
     }
 }
 
-
-
 class GameInfoScene extends AbstractScene
 {
     private $updateTextCallable;
-    
+
     private $print;
-    
+
     private $progressBar;
 
     public function show()
@@ -9357,7 +8611,6 @@ class GameInfoScene extends AbstractScene
             ->status($log)
             ->refresh();
 
-
         $this->progressBar = $this->addWidget(new ProgressBarWidget($this->window));
         $this->progressBar
             ->offset(mb_strlen($log) + 2, 3)
@@ -9383,14 +8636,12 @@ class GameInfoScene extends AbstractScene
     }
 }
 
-
-
 class CheckDependenciesScene extends AbstractScene
 {
     private $updateTextCallable;
-    
+
     private $print;
-    
+
     private $progressBar;
 
     public function show()
@@ -9427,7 +8678,6 @@ class CheckDependenciesScene extends AbstractScene
             ->status($log)
             ->refresh();
 
-
         $this->progressBar = $this->addWidget(new ProgressBarWidget($this->window));
         $this->progressBar
             ->offset(mb_strlen($log) + 2, 3)
@@ -9453,14 +8703,12 @@ class CheckDependenciesScene extends AbstractScene
     }
 }
 
-
-
 class ToolsScene extends AbstractScene {
     public function render()
     {
-        
+
         $config = app('start')->getConfig();
-        
+
         $update = app('start')->getUpdate();
 
         $this->window
@@ -9479,7 +8727,7 @@ class ToolsScene extends AbstractScene {
 
     public function renderMenu()
     {
-        
+
         $fs = app('start')->getFileSystem();
 
         $items = [];
@@ -9679,7 +8927,6 @@ class ToolsScene extends AbstractScene {
                     $select->onEnterEvent(function ($folder) use (&$select, &$type) {
                         $this->removeWidget($select->hide());
 
-                        
                         $config = app('start')->getConfig();
                         $path   = '';
 
@@ -9918,16 +9165,14 @@ class ToolsScene extends AbstractScene {
     public function pressKey($key) {}
 }
 
-
-
 class WineScene extends AbstractScene {
     public function render()
     {
-        
+
         $config = app('start')->getConfig();
-        
+
         $update = app('start')->getUpdate();
-        
+
         $wine = app('start')->getWine();
 
         $this->window
@@ -9958,10 +9203,6 @@ class WineScene extends AbstractScene {
 
         $items[] = ['id' => 'change',          'name' => 'Change Wine version' ];
         $items[] = ['id' => 'recreate_prefix', 'name' => 'Recreate prefix' ];
-
-
-
-
 
         $select = $this->addWidget(new PopupSelectWidget($this->window));
         $select
@@ -10068,14 +9309,12 @@ class WineScene extends AbstractScene {
 
     public function isGalliumNineInstalled()
     {
-        
+
         $config = app('start')->getConfig();
 
         return file_exists($config->getWineSystem32Folder() . '/ninewinecfg.exe');
     }
 }
-
-
 
 class TweaksScene extends AbstractScene
 {
@@ -10083,11 +9322,11 @@ class TweaksScene extends AbstractScene
 
     public function render()
     {
-        
+
         $config = app('start')->getConfig();
-        
+
         $update = app('start')->getUpdate();
-        
+
         $wine = app('start')->getWine();
 
         $this->window
@@ -10140,13 +9379,11 @@ class TweaksScene extends AbstractScene
                 app()->showMain();
             }
             if ('dependencies' === $item['id']) {
-                
+
                 $config = app('start')->getConfig();
 
-                
                 $command = app('start')->getCommand();
 
-                
                 $system = app('start')->getSystem();
 
                 (new CheckDependencies($config, $command, $system))->check();
@@ -10334,22 +9571,17 @@ class TweaksScene extends AbstractScene
     public function pressKey($key) {}
 }
 
-
-
 class ConfigScene extends AbstractScene
 {
     private $selectIndex = 0;
 
-    
     private $config;
 
-    
     public function setConfig($config)
     {
         $this->config = $config;
     }
 
-    
     public function getConfig()
     {
         return null === $this->config ? app('start')->getConfig() : $this->config;
@@ -10357,7 +9589,7 @@ class ConfigScene extends AbstractScene
 
     public function render()
     {
-        
+
         $update = app('start')->getUpdate();
 
         $this->window
@@ -10383,7 +9615,7 @@ class ConfigScene extends AbstractScene
 
     public function renderMenu()
     {
-        
+
         $config = $this->getConfig();
 
         $items = [
@@ -10410,7 +9642,6 @@ class ConfigScene extends AbstractScene
             ['id' => 'config_d9vk_autoupdate',          'name' => '[' . ($config->isD9vkAutoupdate() ? 'ON] ' : 'OFF]') . ' D9VK autoupdate'],
             ['id' => 'config_faudio_autoupdate',        'name' => '[' . ($config->getBool('script', 'faudio_autoupdate') ? 'ON] ' : 'OFF]') . ' FAudio autoupdate'],
             ['id' => 'config_dumbxinputemu_autoupdate', 'name' => '[' . ($config->getBool('script', 'dumbxinputemu_autoupdate') ? 'ON] ' : 'OFF]') . ' Dumbxinputemu autoupdate'],
-
 
             ['id' => 'config_fix_nocrashdialog',        'name' => '[' . (!$config->getBool('fixes', 'nocrashdialog') ? 'ON] ' : 'OFF]') . ' Show crash dialog'],
             ['id' => 'config_fix_focus',                'name' => '[' . ($config->getBool('fixes', 'focus') ? 'ON] ' : 'OFF]') . ' Fix focus'],
@@ -10742,13 +9973,10 @@ class ConfigScene extends AbstractScene
     public function pressKey($key) {}
 }
 
-
-
 abstract class AbstractWidget {
 
-    
     protected $parentWindow;
-    
+
     protected $window;
     protected $active = false;
     protected $visible = false;
@@ -10758,7 +9986,6 @@ abstract class AbstractWidget {
     protected $esc;
     protected $back = false;
 
-    
     public function __construct($window)
     {
         $this->parentWindow = $window;
@@ -10833,7 +10060,7 @@ abstract class AbstractWidget {
             $this->setActive(false);
             $this->getParentWindow()->reload();
             foreach (app()->getCurrentScene()->getWidgets() as $widget) {
-                
+
                 if ($widget->isVisible()) {
                     $widget->refresh();
                 }
@@ -10922,8 +10149,6 @@ abstract class AbstractWidget {
         $this->setVisible(false);
     }
 }
-
-
 
 class SelectWidget extends AbstractWidget
 {
@@ -11078,13 +10303,10 @@ class SelectWidget extends AbstractWidget
     }
 }
 
-
-
 class InfoWidget extends AbstractWidget {
 
-    
     private $data;
-    
+
     private $windowPrint;
 
     private $callback;
@@ -11132,7 +10354,6 @@ class InfoWidget extends AbstractWidget {
         $callback = function ($item) use (&$window) {
             if ('start' === $item['id']) {
 
-                
                 $config  = $item['config'];
                 $update  = app('start')->getUpdate();
                 $command = app('start')->getCommand();
@@ -11440,157 +10661,131 @@ class InfoWidget extends AbstractWidget {
         return $this->config;
     }
 
-    
     public function setConfig($config)
     {
         $this->config = $config;
     }
 
-    
     public function getCommand()
     {
         return $this->command;
     }
 
-    
     public function getSystem()
     {
         return $this->system;
     }
 
-    
     public function getWinePrefix()
     {
         return $this->winePrefix;
     }
 
-    
     public function getGameInfo()
     {
         return $this->gameInfo;
     }
 
-    
     public function getLog()
     {
         return $this->log;
     }
 
-    
     public function getUpdate()
     {
         return $this->update;
     }
 
-    
     public function getMonitor()
     {
         return $this->monitor;
     }
 
-    
     public function getBuffer()
     {
         return $this->buffer;
     }
 
-    
     public function getIcon()
     {
         return $this->icon;
     }
 
-    
     public function getFileSystem()
     {
         return $this->fs;
     }
 
-    
     public function getMountes()
     {
         return $this->mountes;
     }
 
-    
     public function getPack()
     {
         return $this->pack;
     }
 
-    
     public function getSymlink()
     {
         return $this->symlink;
     }
 
-    
     public function getBuild()
     {
         return $this->build;
     }
 
-    
     public function getWine()
     {
         return $this->wine;
     }
 
-    
     public function setWine($wine)
     {
         $this->wine = $wine;
     }
 
-    
     public function getConsole()
     {
         return $this->console;
     }
 
-    
     public function getShapshot()
     {
         return $this->shapshot;
     }
 
-    
     public function getPatch()
     {
         return $this->patch;
     }
 
-    
     public function getReplaces()
     {
         return $this->replaces;
     }
 
-    
     public function getRegistry()
     {
         return $this->registry;
     }
 
-    
     public function getEvent()
     {
         return $this->event;
     }
 
-    
     public function getPlugins()
     {
         return $this->plugins;
     }
 
-    
     public function getDriver()
     {
         return $this->driver;
     }
 
-    
     public function getNetwork()
     {
         return $this->network;
